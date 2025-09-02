@@ -108,7 +108,9 @@
   <input type="text" id="bottomText" placeholder="Bottom text" style="width:45%;"/>
   <br/>
   <button onclick="generateMeme()">Generate Meme</button>
+  <button onclick="generateRandomMeme()">🎲 Random Meme</button>
 </div>
+
 
   <div id="coffeeTriviaModal" style="display:none; position:fixed; top:20px; right:20px; background-color:#ffeaa7; border:1px solid #dfe6e9; padding:10px 20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.2); font-weight:bold; color:#2d3436; font-family:'Segoe UI', sans-serif;">
 </div>
@@ -202,36 +204,89 @@
   }
 
   const memeImages = [
-    "https://i.imgflip.com/1bij.jpg",
-    "https://i.imgflip.com/26am.jpg",
-    "https://i.imgflip.com/2fm6x.jpg",
-    "https://i.imgflip.com/30b1gx.jpg",
-    "https://i.imgflip.com/3si4.jpg"
-  ];
-
-  function generateMeme() {
-    const canvas = document.getElementById("memeCanvas");
-    const ctx = canvas.getContext("2d");
-    const topText = document.getElementById("topText").value;
-    const bottomText = document.getElementById("bottomText").value;
-    const img = new Image();
-    const randomIndex = Math.floor(Math.random() * memeImages.length);
-    img.crossOrigin = "anonymous";
-    img.src = memeImages[randomIndex];
-    img.onload = function () {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      ctx.font = "bold 24px Arial";
-      ctx.fillStyle = "white";
-      ctx.strokeStyle = "black";
-      ctx.lineWidth = 2;
-      ctx.textAlign = "center";
-      ctx.fillText(topText, canvas.width / 2, 40);
-      ctx.strokeText(topText, canvas.width / 2, 40);
-      ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
-      ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 20);
-    };
+  {
+    url: "https://i.imgflip.com/1bij.jpg", // Distracted Boyfriend
+    top: "Me trying to focus",
+    bottom: "But coffee exists ☕"
+  },
+  {
+    url: "https://i.imgflip.com/26am.jpg", // Grumpy Cat
+    top: "Mondays?",
+    bottom: "No thanks."
+  },
+  {
+    url: "https://i.imgflip.com/3si4.jpg", // One Does Not Simply
+    top: "One does not simply",
+    bottom: "Finish a group project without memes"
+  },
+  {
+    url: "https://i.imgflip.com/30b1gx.jpg", // Mocking Spongebob
+    top: "You should sleep early",
+    bottom: "mE: 'sLeEp EaRlY'"
+  },
+  {
+    url: "https://i.imgflip.com/1otk96.jpg", // Roll Safe
+    top: "Can't fail the quiz",
+    bottom: "If you never take it"
+  },
+  {
+    url: "https://i.imgflip.com/2wifvo.jpg", // Woman Yelling at Cat
+    top: "Groupmate: I did my part",
+    bottom: "Reality: 😼"
+  },
+  {
+    url: "https://i.imgflip.com/4t0m5.jpg", // Leonardo DiCaprio Cheers
+    top: "To surviving finals",
+    bottom: "With caffeine and chaos"
+  },
+  {
+    url: "https://i.imgflip.com/1g8my4.jpg", // Confused Math Lady
+    top: "Trying to understand",
+    bottom: "JavaScript logic"
+  },
+  {
+    url: "https://i.imgflip.com/1b7v.jpg", // Success Kid
+    top: "Submitted on time",
+    bottom: "Before the deadline!"
+  },
+  {
+    url: "https://i.imgflip.com/1ur9b0.jpg", // Left Exit 12 Off Ramp
+    top: "Doing homework",
+    bottom: "Making memes instead"
   }
+];
+
+
+function generateMeme() {
+  const canvas = document.getElementById("memeCanvas");
+  const ctx = canvas.getContext("2d");
+  const topText = document.getElementById("topText").value;
+  const bottomText = document.getElementById("bottomText").value;
+  const randomIndex = Math.floor(Math.random() * memeImages.length);
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = memeImages[randomIndex].url;
+  img.onload = function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    ctx.font = "bold 24px Arial";
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.textAlign = "center";
+    ctx.fillText(topText, canvas.width / 2, 40);
+    ctx.strokeText(topText, canvas.width / 2, 40);
+    ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
+    ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 20);
+  };
+}
+
+function generateRandomMeme() {
+  const randomIndex = Math.floor(Math.random() * memeImages.length);
+  document.getElementById("topText").value = memeImages[randomIndex].top;
+  document.getElementById("bottomText").value = memeImages[randomIndex].bottom;
+  generateMeme();
+}
 
 
     const coffeeTrivia = [
