@@ -1,111 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Student Quotes and Reminder</title>
+  <meta charset="UTF-8" />
+  <title>Student Cozy Corner ☕️</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      text-align: center;
+      background-color: #fff8f0;
+      color: #4e342e;
       padding: 30px;
-      background-color: #f9f9f9;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1 {
+      font-size: 36px;
+      text-align: center;
+      margin-bottom: 5px;
     }
     h2 {
-      color: #2c3e50;
-      font-size: 28px;
-      margin-bottom: 20px;
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: normal;
+      color: #6d4c41;
+    }
+    .section {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .column {
+      flex: 1;
+      background-color: #fff3e0;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     input[type="text"] {
+      width: 100%;
       padding: 10px;
-      width: 60%;
+      margin-top: 10px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
     }
     button {
-      background-color: #3498db;
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #a1887f;
       color: white;
       border: none;
-      padding: 10px 20px;
-      font-size: 16px;
       border-radius: 6px;
       cursor: pointer;
-      margin-left: 10px;
     }
-    #tweets {
-      margin-top: 30px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .tweet {
-      background-color: #ffffff;
-      border: 1px solid #ddd;
+    .entry {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #fff;
       border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      font-size: 18px;
-      color: #34495e;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
-    #reminderModal {
-      display: none;
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #ffeaa7;
-      border: 1px solid #dfe6e9;
-      padding: 10px 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      font-weight: bold;
-      color: #2d3436;
+    .reactions span {
+      cursor: pointer;
+      margin-right: 8px;
+      font-size: 20px;
+    }
+    .minigames, .meme-generator {
+      margin-bottom: 40px;
+    }
+    .top-reacted {
+      margin-bottom: 40px;
     }
   </style>
 </head>
 <body>
-  <h2>🌟 Student Quotes and Reminder</h2>
-  <input type="text" id="tweetInput" placeholder="Type your thought..." />
-  <button onclick="postTweet()">Post</button>
-  <div id="tweets"></div>
-  <div id="reminderModal">🧘 Relax and Chill</div>
+  <h1>Student Cozy Corner ☕️</h1>
+  <h2>Welcome to your warm little space to share, laugh, and chill</h2>
+
+  <p style="text-align:center; font-style:italic;">Did you know? Coffee was originally chewed, not sipped! ☕️</p>
+
+  <div class="section">
+    <div class="column">
+      <h3>Student Quotes</h3>
+      <input type="text" id="quoteInput" placeholder="Share a cozy thought..." />
+      <button onclick="postQuote()">Post Quote</button>
+      <div id="quoteList"></div>
+    </div>
+    <div class="column">
+      <h3>Hidden Feelings 💕</h3>
+      <input type="text" id="crushInput" placeholder="Got a secret crush?" />
+      <button onclick="postCrush()">Post Confession</button>
+      <div id="crushList"></div>
+    </div>
+  </div>
+
+  <div class="top-reacted">
+    <h3>Top Reacted Quotes</h3>
+    <ol id="topQuotes"></ol>
+  </div>
+
+  <div class="minigames">
+    <h3>Minigames</h3>
+    <p>[☕️ Coffee Clicker] | [🧠 Quote Quiz]</p>
+  </div>
+
+  <div class="meme-generator">
+    <h3>Meme Generator</h3>
+    <p>[Insert Meme Here]</p>
+    <button onclick="randomizeMeme()">Randomize Meme</button>
+  </div>
 
   <script>
-    const avatars = [
-      "👟 Talking Shoe",
-      "🍕 Philosophical Pizza",
-      "🧃 Chill Juice Box",
-      "🧸 Soft Teddy Bear",
-      "🎩 Fancy Hat",
-      "🧦 Lost Sock",
-      "📎 Motivational Paperclip",
-      "🌸 Dramatic Flower",
-      "🕶️ Cool Sunglasses",
-      "🏀 Wise Basketball"
-    ];
+    const quoteList = [];
+    const crushList = [];
+    const reactions = ["❤️", "😆", "😢", "😮", "😡"];
 
-    function postTweet() {
-      const input = document.getElementById("tweetInput");
-      const tweet = input.value.trim();
-      if (tweet) {
-        const avatar = avatars[Math.floor(Math.random() * avatars.length)];
-        const tweetDiv = document.createElement("div");
-        tweetDiv.className = "tweet";
-        tweetDiv.innerHTML = `<strong>${avatar}:</strong> ${tweet}`;
-        document.getElementById("tweets").appendChild(tweetDiv);
+    function postQuote() {
+      const input = document.getElementById("quoteInput");
+      const text = input.value.trim();
+      if (text) {
+        const entry = { text, reacts: {} };
+        reactions.forEach(r => entry.reacts[r] = 0);
+        quoteList.push(entry);
         input.value = "";
+        renderQuotes();
+        updateTopQuotes();
       }
     }
 
-    function displayReminder() {
-      const modal = document.getElementById("reminderModal");
-      modal.style.display = "block";
-      setTimeout(() => {
-        modal.style.display = "none";
-      }, 3000);
+    function postCrush() {
+      const input = document.getElementById("crushInput");
+      const text = input.value.trim();
+      if (text) {
+        crushList.push(text);
+        input.value = "";
+        renderCrushes();
+      }
     }
 
-    setInterval(displayReminder, 5000);
+    function reactToQuote(index, emoji) {
+      quoteList[index].reacts[emoji]++;
+      renderQuotes();
+      updateTopQuotes();
+    }
+
+    function renderQuotes() {
+      const container = document.getElementById("quoteList");
+      container.innerHTML = "";
+      quoteList.forEach((q, i) => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.innerHTML = `<strong>${q.text}</strong><br/>
+          <div class="reactions">
+            ${reactions.map(r => `<span onclick="reactToQuote(${i}, '${r}')">${r} ${q.reacts[r]}</span>`).join(" ")}
+          </div>`;
+        container.appendChild(div);
+      });
+    }
+
+    function renderCrushes() {
+      const container = document.getElementById("crushList");
+      container.innerHTML = "";
+      crushList.forEach(c => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.innerHTML = `<em>${c}</em>`;
+        container.appendChild(div);
+      });
+    }
+
+    function updateTopQuotes() {
+      const sorted = [...quoteList].sort((a, b) => {
+        const totalA = Object.values(a.reacts).reduce((sum, val) => sum + val, 0);
+        const totalB = Object.values(b.reacts).reduce((sum, val) => sum + val, 0);
+        return totalB - totalA;
+      }).slice(0, 3);
+      const list = document.getElementById("topQuotes");
+      list.innerHTML = "";
+      sorted.forEach(q => {
+        const li = document.createElement("li");
+        li.textContent = q.text;
+        list.appendChild(li);
+      });
+    }
+
+    function randomizeMeme() {
+      alert("✨ Meme generator coming soon!");
+    }
   </script>
 </body>
 </html>
