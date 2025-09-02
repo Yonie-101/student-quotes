@@ -12,18 +12,6 @@
       max-width: 900px;
       margin: auto;
     }
-    h1 {
-      font-size: 36px;
-      text-align: center;
-      margin-bottom: 5px;
-    }
-    h2 {
-      font-size: 20px;
-      text-align: center;
-      margin-bottom: 30px;
-      font-weight: normal;
-      color: #6d4c41;
-    }
     .section {
       display: flex;
       justify-content: space-between;
@@ -66,19 +54,12 @@
       margin-right: 8px;
       font-size: 20px;
     }
-    .minigames, .meme-generator {
-      margin-bottom: 40px;
-    }
-    .top-reacted {
+    .top-reacted, .minigames, .meme-generator {
       margin-bottom: 40px;
     }
   </style>
 </head>
 <body>
-  <h1>Student Cozy Corner ☕️</h1>
-  <h2>Welcome to your warm little space to share, laugh, and chill</h2>
-
-  <p style="text-align:center; font-style:italic;">Did you know? Coffee was originally chewed, not sipped! ☕️</p>
 
   <div class="section">
     <div class="column">
@@ -102,7 +83,21 @@
 
   <div class="minigames">
     <h3>Minigames</h3>
-    <p>[☕️ Coffee Clicker] | [🧠 Quote Quiz]</p>
+
+    <div style="text-align:center; background:#fff3e0; padding:20px; border-radius:12px; margin-bottom:20px;">
+      <h4>☕️ Coffee Clicker</h4>
+      <p>Cups brewed: <span id="coffeeCount">0</span></p>
+      <button onclick="brewCoffee()">Brew Coffee</button>
+    </div>
+
+    <div style="background:#fff3e0; padding:20px; border-radius:12px;">
+      <h4>🧠 Quote Quiz</h4>
+      <p id="quizQuestion">Who said: "The only way to do great work is to love what you do"?</p>
+      <button onclick="checkAnswer('Steve Jobs')">Steve Jobs</button>
+      <button onclick="checkAnswer('Albert Einstein')">Albert Einstein</button>
+      <button onclick="checkAnswer('Oprah Winfrey')">Oprah Winfrey</button>
+      <p id="quizFeedback" style="margin-top:10px;"></p>
+    </div>
   </div>
 
   <div class="meme-generator">
@@ -183,6 +178,19 @@
         li.textContent = q.text;
         list.appendChild(li);
       });
+    }
+
+    function brewCoffee() {
+      coffeeCount++;
+      document.getElementById("coffeeCount").textContent = coffeeCount;
+    }
+
+    let coffeeCount = 0;
+
+    function checkAnswer(answer) {
+      const correct = "Steve Jobs";
+      const feedback = document.getElementById("quizFeedback");
+      feedback.textContent = answer === correct ? "✅ Correct!" : "❌ Try again!";
     }
 
     function randomizeMeme() {
