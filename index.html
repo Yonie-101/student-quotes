@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Quotes and Reminder</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 30px;
+      background-color: #f9f9f9;
+    }
+    h2 {
+      color: #2c3e50;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 60%;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    #tweets {
+      margin-top: 30px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .tweet {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      font-size: 18px;
+      color: #34495e;
+    }
+    #reminderModal {
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #ffeaa7;
+      border: 1px solid #dfe6e9;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      font-weight: bold;
+      color: #2d3436;
+    }
+  </style>
+</head>
+<body>
+  <h2>🌟 Student Quotes and Reminder</h2>
+  <input type="text" id="tweetInput" placeholder="Type your thought..." />
+  <button onclick="postTweet()">Post</button>
+  <div id="tweets"></div>
+  <div id="reminderModal">🧘 Relax and Chill</div>
+
+  <script>
+    const avatars = [
+      "👟 Talking Shoe",
+      "🍕 Philosophical Pizza",
+      "🧃 Chill Juice Box",
+      "🧸 Soft Teddy Bear",
+      "🎩 Fancy Hat",
+      "🧦 Lost Sock",
+      "📎 Motivational Paperclip",
+      "🌸 Dramatic Flower",
+      "🕶️ Cool Sunglasses",
+      "🏀 Wise Basketball"
+    ];
+
+    function postTweet() {
+      const input = document.getElementById("tweetInput");
+      const tweet = input.value.trim();
+      if (tweet) {
+        const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+        const tweetDiv = document.createElement("div");
+        tweetDiv.className = "tweet";
+        tweetDiv.innerHTML = `<strong>${avatar}:</strong> ${tweet}`;
+        document.getElementById("tweets").appendChild(tweetDiv);
+        input.value = "";
+      }
+    }
+
+    function displayReminder() {
+      const modal = document.getElementById("reminderModal");
+      modal.style.display = "block";
+      setTimeout(() => {
+        modal.style.display = "none";
+      }, 3000);
+    }
+
+    setInterval(displayReminder, 5000);
+  </script>
+</body>
+</html>
