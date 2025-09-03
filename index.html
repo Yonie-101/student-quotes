@@ -103,6 +103,70 @@
   }
 }
 
+    .scrollable-box {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+
+    .top-reacted ol {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 0;
+  list-style: none;
+}
+
+.top-reacted li {
+  flex: 1;
+  background: #fff3e0;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.top-reacted li:hover .reaction-counts {
+  display: block;
+}
+
+.reaction-counts {
+  display: none;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 14px;
+  background: #ffeaa7;
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+
+.entry .reactions {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.entry:hover .reactions {
+  opacity: 1;
+}
+
+.reaction-circle {
+  position: absolute;
+  bottom: -10px;
+  left: -10px;
+  background: #ffeaa7;
+  border-radius: 50%;
+  padding: 6px;
+  font-size: 14px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+}
+
+
+
+    
   </style>
 </head>
 <body>
@@ -112,13 +176,14 @@
       <h3>Student Quotes</h3>
       <input type="text" id="quoteInput" placeholder="Share a cozy thought..." />
       <button onclick="postQuote()">Post Quote</button>
-      <div id="quoteList"></div>
+      <button onclick="generateRandomQuote()">🎲 Random Quote</button>
+  <div id="quoteList" class="scrollable-box"></div>
     </div>
     <div class="column">
       <h3>Hidden Feelings 💕</h3>
       <input type="text" id="crushInput" placeholder="Got a secret crush?" />
       <button onclick="postCrush()">Post Confession</button>
-      <div id="crushList"></div>
+<div id="crushList" class="scrollable-box"></div>
     </div>
   </div>
 
@@ -127,6 +192,11 @@
     <ol id="topQuotes"></ol>
   </div>
 
+
+
+
+
+  
   <div class="minigames">
     <h3>Minigames</h3>
 
@@ -159,17 +229,22 @@
 
   </div>
 
-    <div style="margin-top:30px;">
-  <h4>🖼️ Meme Gallery</h4>
-  <div id="memeGallery" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
-</div>
+    
 
 
     
 </div>
 
+  <div style="margin-top:30px;">
+  <h4>🖼️ Meme Gallery</h4>
+  <div id="generatedMemeGallery" class="scrollable-box" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+</div>
+
   <div style="margin-top:30px; background:#fff3e0; padding:20px; border-radius:12px;">
   <h4>📤 Submit Your Own Meme Template</h4>
+    <button onclick="toggleMemeInput()">Switch to File Upload</button>
+<input type="file" id="customFile" style="display:none;" />
+
   <input type="text" id="customUrl" placeholder="Image URL" style="width:100%; margin-bottom:10px;" />
   <input type="text" id="customTop" placeholder="Top text" style="width:100%; margin-bottom:10px;" />
   <input type="text" id="customBottom" placeholder="Bottom text" style="width:100%; margin-bottom:10px;" />
@@ -199,6 +274,18 @@
         updateTopQuotes();
       }
     }
+
+    const randomQuotes = [
+  { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+  { text: "Coffee first. Schemes later.", author: "Yeon" },
+  { text: "Success is not final, failure is not fatal.", author: "Winston Churchill" },
+];
+
+function generateRandomQuote() {
+  const pick = randomQuotes[Math.floor(Math.random() * randomQuotes.length)];
+  document.getElementById("quoteInput").value = `"${pick.text}" — ${pick.author}`;
+}
+
 
     function postCrush() {
       const input = document.getElementById("crushInput");
@@ -237,9 +324,17 @@
     reactionDiv.className = "reactions";
     if (selected) reactionDiv.setAttribute("data-selected", "true");
 
+
+    const circle = document.createElement("div");
+circle.className = "reaction-circle";
+const activeReacts = Object.entries(q.reacts).filter(([_, count]) => count > 0).slice(0, 3);
+circle.textContent = activeReacts.map(([r]) => r).join(" ");
+div.style.position = "relative";
+div.appendChild(circle);
+
     reactions.forEach(r => {
       const span = document.createElement("span");
-      span.textContent = `${r} ${q.reacts[r]}`;
+      span.textContent = r;
       if (selected === r) span.setAttribute("data-active", "true");
       span.onclick = () => {
         q.selectedReaction = r;
@@ -278,7 +373,13 @@
       list.innerHTML = "";
       sorted.forEach(q => {
         const li = document.createElement("li");
-        li.textContent = q.text;
+        li.innerHTML = `
+  <strong>${q.text}</strong>
+  <div class="reaction-counts">
+    ${Object.entries(q.reacts).map(([r, count]) => `${r} ${count}`).join(" ")}
+  </div>
+`;
+
         list.appendChild(li);
       });
     }
@@ -356,12 +457,13 @@ function generateMeme() {
   const topText = document.getElementById("topText").value;
   const bottomText = document.getElementById("bottomText").value;
   const randomIndex = Math.floor(Math.random() * memeImages.length);
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  img.src = memeImages[randomIndex].url;
-  img.onload = function () {
+  const memeImg = new Image();
+  memeImg.crossOrigin = "anonymous";
+  memeImg.src = memeImages[randomIndex].url;
+
+  memeImg.onload = function () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(memeImg, 0, 0, canvas.width, canvas.height);
     ctx.font = "bold 24px Arial";
     ctx.fillStyle = "white";
     ctx.strokeStyle = "black";
@@ -371,8 +473,20 @@ function generateMeme() {
     ctx.strokeText(topText, canvas.width / 2, 40);
     ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
     ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 20);
+
+    const canvasCopy = document.createElement("canvas");
+    canvasCopy.width = 120;
+    canvasCopy.height = 120;
+    const ctxCopy = canvasCopy.getContext("2d");
+    ctxCopy.drawImage(canvas, 0, 0, 120, 120);
+    const thumbImg = new Image();
+    thumbImg.src = canvasCopy.toDataURL("image/png");
+    thumbImg.style.borderRadius = "8px";
+    thumbImg.style.margin = "5px";
+    document.getElementById("generatedMemeGallery").appendChild(thumbImg);
   };
 }
+
 
 function generateRandomMeme() {
   const randomIndex = Math.floor(Math.random() * memeImages.length);
@@ -400,7 +514,7 @@ function showCoffeeTrivia() {
   }, 4000);
 }
 
-setInterval(showCoffeeTrivia, 5000);
+setInterval(showCoffeeTrivia, 7000);
 
 function downloadMeme() {
   const canvas = document.getElementById("memeCanvas");
@@ -441,7 +555,7 @@ window.onload = function () {
 };
 
     function renderMemeGallery() {
-  const gallery = document.getElementById("memeGallery");
+  const gallery = document.getElementById("generatedMemeGallery");
   gallery.innerHTML = "";
   const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
   savedMemes.forEach(meme => {
@@ -466,6 +580,21 @@ window.onload = function () {
   document.getElementById("emojiBurstContainer").appendChild(burst);
   setTimeout(() => burst.remove(), 1000);
 }
+
+    
+    function toggleMemeInput() {
+  const urlInput = document.getElementById("customUrl");
+  const fileInput = document.getElementById("customFile");
+  if (urlInput.style.display !== "none") {
+    urlInput.style.display = "none";
+    fileInput.style.display = "block";
+  } else {
+    urlInput.style.display = "block";
+    fileInput.style.display = "none";
+  }
+}
+
+
 
 </script>
 
