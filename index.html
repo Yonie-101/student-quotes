@@ -265,17 +265,19 @@
     const reactions = ["❤️", "😆", "😢", "😮", "😡"];
 
     function postQuote() {
-      const input = document.getElementById("quoteInput");
-      const text = input.value.trim();
-      if (text) {
-        const entry = { text, reacts: {} };
-        reactions.forEach(r => entry.reacts[r] = 0);
-        quoteList.push(entry);
-        input.value = "";
-        renderQuotes();
-        updateTopQuotes();
-      }
-    }
+  const input = document.getElementById("quoteInput");
+  const text = input.value.trim();
+  if (text) {
+    const entry = { text, reacts: {}, selectedReaction: null };
+    reactions.forEach(r => entry.reacts[r] = 0);
+    quoteList.push(entry);
+    input.value = "";
+    saveQuotes();
+    renderQuotes();
+    updateTopQuotes();
+  }
+}
+
 
     const randomQuotes = [
   { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
@@ -625,6 +627,26 @@ function clearMemeGallery() {
     gallery.innerHTML = "";
   }
 }
+
+    function saveQuotes() {
+  localStorage.setItem("studentQuotes", JSON.stringify(quoteList));
+}
+
+function loadQuotes() {
+  const saved = JSON.parse(localStorage.getItem("studentQuotes") || "[]");
+  quoteList.length = 0; // Clear current list
+  saved.forEach(q => quoteList.push(q));
+}
+
+    window.onload = function () {
+  loadQuotes();
+  renderQuotes();
+  updateTopQuotes();
+
+  const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
+  savedMemes.forEach(meme => memeImages.push(meme));
+  renderMemeGallery();
+};
 
 
 
