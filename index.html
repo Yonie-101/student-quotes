@@ -525,36 +525,49 @@ function downloadMeme() {
   link.href = canvas.toDataURL("image/png");
   link.click();
 }
-
 function submitCustomMeme() {
-  const url = document.getElementById("customUrl").value.trim();
+  const urlInput = document.getElementById("customUrl");
+  const fileInput = document.getElementById("customFile");
   const top = document.getElementById("customTop").value.trim();
   const bottom = document.getElementById("customBottom").value.trim();
-  if (url && top && bottom) {
-    const newMeme = { url, top, bottom };
-    memeImages.push(newMeme);
 
-    // Save to localStorage
-    const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
-    savedMemes.push(newMeme);
-    localStorage.setItem("studentMemes", JSON.stringify(savedMemes));
+  const isFileMode = fileInput.style.display !== "none";
 
-    alert("✅ Meme template added! Try Random Meme to see it.");
-    document.getElementById("customUrl").value = "";
-    document.getElementById("customTop").value = "";
-    document.getElementById("customBottom").value = "";
+  if (top && bottom && (isFileMode ? fileInput.files.length > 0 : urlInput.value.trim())) {
+    let memeURL = "";
 
-    renderMemeGallery(); // Update gallery
+    if (isFileMode) {
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        memeURL = e.target.result;
+        saveCustomMeme(memeURL, top, bottom);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      memeURL = urlInput.value.trim();
+      saveCustomMeme(memeURL, top, bottom);
+    }
   } else {
     alert("⚠️ Please fill in all fields.");
   }
 }
+function saveCustomMeme(url, top, bottom) {
+  const newMeme = { url, top, bottom };
+  memeImages.push(newMeme);
 
-window.onload = function () {
   const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
-  savedMemes.forEach(meme => memeImages.push(meme));
+  savedMemes.push(newMeme);
+  localStorage.setItem("studentMemes", JSON.stringify(savedMemes));
+
+  alert("✅ Meme template added! Try Random Meme to see it.");
+  document.getElementById("customUrl").value = "";
+  document.getElementById("customTop").value = "";
+  document.getElementById("customBottom").value = "";
+  document.getElementById("customFile").value = "";
+
   renderMemeGallery();
-};
+}
 
     function renderMemeGallery() {
   const gallery = document.getElementById("generatedMemeGallery");
