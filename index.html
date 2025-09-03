@@ -49,14 +49,60 @@
       border-radius: 8px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
-    .reactions span {
-      cursor: pointer;
-      margin-right: 8px;
-      font-size: 20px;
-    }
+    .reactions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  transition: opacity 0.3s ease;
+}
+
+.reactions span {
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 1;
+  transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.reactions span:hover {
+  transform: scale(1.2);
+}
+
+.reactions[data-selected] span:not([data-active]) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.reactions[data-selected]:hover span {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+    
     .top-reacted, .minigames, .meme-generator {
       margin-bottom: 40px;
     }
+
+    .emoji-burst {
+  position: absolute;
+  font-size: 24px;
+  animation: floatUp 1s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-40px) scale(1.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(0.8);
+  }
+}
+
   </style>
 </head>
 <body>
@@ -100,16 +146,36 @@
     </div>
   </div>
 
-  <div class="meme-generator">
-  <h3>Meme Generator</h3>
+  <div class="meme-generator" style="display: flex; gap: 20px; align-items: flex-start;">
   <canvas id="memeCanvas" width="400" height="400" style="border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1);"></canvas>
-  <br/>
-  <input type="text" id="topText" placeholder="Top text" style="margin-top:10px; width:45%;"/>
-  <input type="text" id="bottomText" placeholder="Bottom text" style="width:45%;"/>
-  <br/>
-  <button onclick="generateMeme()">Generate Meme</button>
-  <button onclick="generateRandomMeme()">🎲 Random Meme</button>
+
+  <div style="flex: 1;">
+    <h3>Meme Generator</h3>
+    <input type="text" id="topText" placeholder="Top text" style="margin-bottom:10px; width:100%;"/>
+    <input type="text" id="bottomText" placeholder="Bottom text" style="margin-bottom:10px; width:100%;"/>
+    <button onclick="generateMeme()" style="width:100%; margin-bottom:10px;">Generate Meme</button>
+    <button onclick="generateRandomMeme()" style="width:100%;">🎲 Random Meme</button>
+    <button onclick="downloadMeme()" style="width:100%; margin-top:10px;">⬇️ Download Meme</button>
+
+  </div>
+
+    <div style="margin-top:30px;">
+  <h4>🖼️ Meme Gallery</h4>
+  <div id="memeGallery" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
 </div>
+
+
+    
+</div>
+
+  <div style="margin-top:30px; background:#fff3e0; padding:20px; border-radius:12px;">
+  <h4>📤 Submit Your Own Meme Template</h4>
+  <input type="text" id="customUrl" placeholder="Image URL" style="width:100%; margin-bottom:10px;" />
+  <input type="text" id="customTop" placeholder="Top text" style="width:100%; margin-bottom:10px;" />
+  <input type="text" id="customBottom" placeholder="Bottom text" style="width:100%; margin-bottom:10px;" />
+  <button onclick="submitCustomMeme()" style="width:100%;">Add to Meme List</button>
+</div>
+
 
 
   <div id="coffeeTriviaModal" style="display:none; position:fixed; top:20px; right:20px; background-color:#ffeaa7; border:1px solid #dfe6e9; padding:10px 20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.2); font-weight:bold; color:#2d3436; font-family:'Segoe UI', sans-serif;">
@@ -145,24 +211,51 @@
     }
 
     function reactToQuote(index, emoji) {
-      quoteList[index].reacts[emoji]++;
-      renderQuotes();
-      updateTopQuotes();
-    }
+  quoteList[index].selectedReaction = emoji;
+  quoteList[index].reacts[emoji]++;
+  renderQuotes();
+  updateTopQuotes();
+
+  // Get mouse position for burst
+  document.addEventListener("click", function burstHandler(e) {
+    triggerEmojiBurst(emoji, e.clientX, e.clientY);
+    document.removeEventListener("click", burstHandler);
+  });
+}
+
 
     function renderQuotes() {
-      const container = document.getElementById("quoteList");
-      container.innerHTML = "";
-      quoteList.forEach((q, i) => {
-        const div = document.createElement("div");
-        div.className = "entry";
-        div.innerHTML = `<strong>${q.text}</strong><br/>
-          <div class="reactions">
-            ${reactions.map(r => `<span onclick="reactToQuote(${i}, '${r}')">${r} ${q.reacts[r]}</span>`).join(" ")}
-          </div>`;
-        container.appendChild(div);
-      });
-    }
+  const container = document.getElementById("quoteList");
+  container.innerHTML = "";
+  quoteList.forEach((q, i) => {
+    const div = document.createElement("div");
+    div.className = "entry";
+
+    const selected = q.selectedReaction || null;
+
+    const reactionDiv = document.createElement("div");
+    reactionDiv.className = "reactions";
+    if (selected) reactionDiv.setAttribute("data-selected", "true");
+
+    reactions.forEach(r => {
+      const span = document.createElement("span");
+      span.textContent = `${r} ${q.reacts[r]}`;
+      if (selected === r) span.setAttribute("data-active", "true");
+      span.onclick = () => {
+        q.selectedReaction = r;
+        q.reacts[r]++;
+        renderQuotes();
+        updateTopQuotes();
+      };
+      reactionDiv.appendChild(span);
+    });
+
+    div.innerHTML = `<strong>${q.text}</strong>`;
+    div.appendChild(reactionDiv);
+    container.appendChild(div);
+  });
+}
+
 
     function renderCrushes() {
       const container = document.getElementById("crushList");
@@ -307,10 +400,76 @@ function showCoffeeTrivia() {
   }, 4000);
 }
 
-setInterval(showCoffeeTrivia, 7000);
+setInterval(showCoffeeTrivia, 5000);
+
+function downloadMeme() {
+  const canvas = document.getElementById("memeCanvas");
+  const link = document.createElement("a");
+  link.download = "student-meme.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
+function submitCustomMeme() {
+  const url = document.getElementById("customUrl").value.trim();
+  const top = document.getElementById("customTop").value.trim();
+  const bottom = document.getElementById("customBottom").value.trim();
+  if (url && top && bottom) {
+    const newMeme = { url, top, bottom };
+    memeImages.push(newMeme);
+
+    // Save to localStorage
+    const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
+    savedMemes.push(newMeme);
+    localStorage.setItem("studentMemes", JSON.stringify(savedMemes));
+
+    alert("✅ Meme template added! Try Random Meme to see it.");
+    document.getElementById("customUrl").value = "";
+    document.getElementById("customTop").value = "";
+    document.getElementById("customBottom").value = "";
+
+    renderMemeGallery(); // Update gallery
+  } else {
+    alert("⚠️ Please fill in all fields.");
+  }
+}
+
+window.onload = function () {
+  const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
+  savedMemes.forEach(meme => memeImages.push(meme));
+  renderMemeGallery();
+};
+
+    function renderMemeGallery() {
+  const gallery = document.getElementById("memeGallery");
+  gallery.innerHTML = "";
+  const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
+  savedMemes.forEach(meme => {
+    const img = document.createElement("img");
+    img.src = meme.url;
+    img.alt = "Student Meme";
+    img.style.width = "120px";
+    img.style.height = "120px";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "8px";
+    img.title = `${meme.top} / ${meme.bottom}`;
+    gallery.appendChild(img);
+  });
+}
+
+    function triggerEmojiBurst(emoji, x, y) {
+  const burst = document.createElement("div");
+  burst.className = "emoji-burst";
+  burst.textContent = emoji;
+  burst.style.left = `${x}px`;
+  burst.style.top = `${y}px`;
+  document.getElementById("emojiBurstContainer").appendChild(burst);
+  setTimeout(() => burst.remove(), 1000);
+}
 
 </script>
 
-  
+  <div id="emojiBurstContainer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden;"></div>
+
 </body>
 </html>
