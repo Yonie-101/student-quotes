@@ -238,6 +238,8 @@
   <div style="margin-top:30px;">
   <h4>🖼️ Meme Gallery</h4>
   <div id="generatedMemeGallery" class="scrollable-box" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+    <button onclick="clearMemeGallery()" style="margin-top:10px; background:#d32f2f;">🗑️ Clear Gallery</button>
+
 </div>
 
   <div style="margin-top:30px; background:#fff3e0; padding:20px; border-radius:12px;">
@@ -591,6 +593,13 @@ window.onload = function () {
   } else {
     urlInput.style.display = "block";
     fileInput.style.display = "none";
+  }
+}
+
+function clearMemeGallery() {
+  if (confirm("Are you sure you want to clear all memes from the gallery?")) {
+    const gallery = document.getElementById("generatedMemeGallery");
+    gallery.innerHTML = "";
   }
 }
 
