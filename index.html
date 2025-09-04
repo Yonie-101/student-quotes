@@ -662,35 +662,36 @@ function generateMeme() {
   memeImg.src = selectedMemeURL || memeImages[Math.floor(Math.random() * memeImages.length)].url;
 
   memeImg.onload = function () {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(memeImg, 0, 0, canvas.width, canvas.height);
-    ctx.font = "bold 24px Arial";
-    ctx.fillStyle = "white";
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-    ctx.textAlign = "center";
-    ctx.fillText(topText, canvas.width / 2, 40);
-    ctx.strokeText(topText, canvas.width / 2, 40);
-    ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
-    ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 20);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(memeImg, 0, 0, canvas.width, canvas.height);
+  ctx.font = "bold 24px Arial";
+  ctx.fillStyle = "white";
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
+  ctx.textAlign = "center";
+  ctx.fillText(topText, canvas.width / 2, 40);
+  ctx.strokeText(topText, canvas.width / 2, 40);
+  ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
+  ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 20);
 
-    const canvasCopy = document.createElement("canvas");
-    canvasCopy.width = 120;
-    canvasCopy.height = 120;
-    const ctxCopy = canvasCopy.getContext("2d");
-    ctxCopy.drawImage(canvas, 0, 0, 120, 120);
+  const canvasCopy = document.createElement("canvas");
+  canvasCopy.width = 120;
+  canvasCopy.height = 120;
+  const ctxCopy = canvasCopy.getContext("2d");
+  ctxCopy.drawImage(canvas, 0, 0, 120, 120);
 
-    const thumbImg = new Image();
-    thumbImg.src = canvasCopy.toDataURL("image/png");
-    thumbImg.style.borderRadius = "8px";
-    thumbImg.style.margin = "5px";
-    document.getElementById("generatedMemeGallery").appendChild(thumbImg);
+  const thumbImg = new Image();
+  thumbImg.src = canvasCopy.toDataURL("image/png");
+  thumbImg.style.borderRadius = "8px";
+  thumbImg.style.margin = "5px";
 
+  setTimeout(() => {
     const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
     saved.push(thumbImg.src);
     localStorage.setItem("generatedMemes", JSON.stringify(saved));
     renderMemeCollections();
-  };
+  }, 100);
+};
 }
 
 
@@ -862,7 +863,7 @@ function memeCollections() {
 
 function loadQuotes() {
   const saved = JSON.parse(localStorage.getItem("studentQuotes") || "[]");
-  quoteList.length = 0; // Clear current list
+  quoteList.length = 0; 
   saved.forEach(q => quoteList.push(q));
 }
 
