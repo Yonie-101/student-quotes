@@ -5,51 +5,72 @@
   <title>Student Cozy Corner ☕️</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fff8f0;
-      color: #4e342e;
-      padding: 30px;
-      max-width: 900px;
-      margin: auto;
-    }
-    .section {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 40px;
-    }
-    .column {
-      flex: 1;
-      background-color: #fff3e0;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #a1887f;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .entry {
-      margin-top: 15px;
-      padding: 10px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    }
-    .reactions {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fff8f0;
+  color: #4e342e;
+  padding: 30px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.section {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.column {
+  flex: 1;
+  background-color: #fff3e0;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #a1887f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#confessionExpiry {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background-color: #a1887f;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#customFile {
+  margin-top: 10px;
+}
+
+.entry {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  position: relative;
+}
+
+.reactions {
   display: flex;
   gap: 8px;
   margin-top: 8px;
@@ -77,40 +98,34 @@
   pointer-events: auto;
 }
 
-    
-    .top-reacted, .minigames, .meme-generator {
-      margin-bottom: 40px;
-    }
+.entry:hover .reactions {
+  opacity: 1;
+}
 
-    .emoji-burst {
+.entry:hover .reaction-circle {
+  opacity: 0;
+}
+
+.reaction-circle {
   position: absolute;
-  font-size: 24px;
-  animation: floatUp 1s ease-out forwards;
-  pointer-events: none;
+  bottom: -10px;
+  left: -10px;
+  background: #ffeaa7;
+  border-radius: 50%;
+  padding: 6px;
+  font-size: 14px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
 
-@keyframes floatUp {
-  0% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-40px) scale(1.4);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-80px) scale(0.8);
-  }
+.top-reacted,
+.minigames,
+.meme-generator {
+  margin-bottom: 40px;
 }
 
-    .scrollable-box {
-  max-height: 300px;
-  overflow-y: auto;
-  padding-right: 10px;
-}
-
-
-    .top-reacted ol {
+.top-reacted ol {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
@@ -143,25 +158,31 @@
   border-radius: 8px;
 }
 
-
-.entry .reactions {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.entry:hover .reactions {
-  opacity: 1;
-}
-
-.reaction-circle {
+.emoji-burst {
   position: absolute;
-  bottom: -10px;
-  left: -10px;
-  background: #ffeaa7;
-  border-radius: 50%;
-  padding: 6px;
-  font-size: 14px;
-  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  font-size: 24px;
+  animation: floatUp 1s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-40px) scale(1.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(0.8);
+  }
+}
+
+.scrollable-box {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 10px;
 }
 
 
@@ -185,6 +206,7 @@
       <div style="display: flex; gap: 10px; margin-top: 10px;">
   <select id="confessionExpiry" style="flex: 1;">
     <option value="">⏳ Select expiry time</option>
+    <option value="0.5">30 seconds</option>
     <option value="5">5 minutes</option>
     <option value="15">15 minutes</option>
     <option value="30">30 minutes</option>
@@ -258,7 +280,7 @@
   <div style="margin-top:30px; background:#fff3e0; padding:20px; border-radius:12px;">
   <h4>📤 Submit Your Own Meme Template</h4>
     <button onclick="toggleMemeInput()">Switch to File Upload</button>
-<input type="file" id="customFile" style="display:none;" />
+<input type="file" id="customFile" style="display:none; margin-top:10px;" />
 
   <input type="text" id="customUrl" placeholder="Image URL" style="width:100%; margin-bottom:10px;" />
   <input type="text" id="customTop" placeholder="Top text" style="width:100%; margin-bottom:10px;" />
@@ -662,14 +684,21 @@ function saveCustomMeme(url, top, bottom) {
     function toggleMemeInput() {
   const urlInput = document.getElementById("customUrl");
   const fileInput = document.getElementById("customFile");
-  if (urlInput.style.display !== "none") {
+  const toggleBtn = document.querySelector('[onclick="toggleMemeInput()"]');
+
+  const isUrlMode = urlInput.style.display !== "none";
+
+  if (isUrlMode) {
     urlInput.style.display = "none";
     fileInput.style.display = "block";
+    toggleBtn.textContent = "Switch to Image URL";
   } else {
     urlInput.style.display = "block";
     fileInput.style.display = "none";
+    toggleBtn.textContent = "Switch to File Upload";
   }
 }
+
 
 function clearMemeGallery() {
   if (confirm("Are you sure you want to clear all memes from the gallery?")) {
