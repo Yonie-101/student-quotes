@@ -115,7 +115,7 @@
   .reaction-circle {
     position: absolute;
     bottom: -10px;
-    left: 10px; /* ✅ nudged inward to avoid scroll clipping */
+    left: 10px; 
     background: #ffeaa7;
     border-radius: 50%;
     padding: 6px;
@@ -220,7 +220,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.2); /* ✅ subtle gray backdrop */
+  background: rgba(0, 0, 0, 0.2); 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -626,7 +626,7 @@ function triggerEmojiBurst(emoji, x, y) {
     function checkAnswer(answer) {
     const correct = "Steve Jobs";
     const feedback = document.getElementById("quizFeedback");
-    feedback.textContent = answer === correct ? "✅ Correct!" : "❌ Try again!";
+    feedback.textContent = answer === correct ? "Nice! You deserve a latte!" : "Oops, Try again!";
   }
 
   const memeImages = [
@@ -849,7 +849,6 @@ function saveCustomMeme(url, top, bottom) {
     img.style.margin = "5px";
     img.style.cursor = "pointer";
 
-    // ✅ Clean click handler
     img.onclick = () => openCollectionModal(src);
 
     gallery.appendChild(img);
