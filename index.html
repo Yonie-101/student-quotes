@@ -376,6 +376,10 @@
 
 
   <script>
+let selectedMemeURL = null;
+
+
+    
     const quoteList = [];
     const crushList = [];
     const reactions = ["❤️", "😆", "😢", "😮", "😡"];
@@ -624,10 +628,10 @@ function generateMeme() {
   const ctx = canvas.getContext("2d");
   const topText = document.getElementById("topText").value;
   const bottomText = document.getElementById("bottomText").value;
-  const randomIndex = Math.floor(Math.random() * memeImages.length);
-  const memeImg = new Image();
-  memeImg.crossOrigin = "anonymous";
-  memeImg.src = memeImages[randomIndex].url;
+const memeImg = new Image();
+memeImg.crossOrigin = "anonymous";
+memeImg.src = selectedMemeURL || memeImages[Math.floor(Math.random() * memeImages.length)].url;
+
 
   memeImg.onload = function () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -652,6 +656,12 @@ function generateMeme() {
     thumbImg.style.borderRadius = "8px";
     thumbImg.style.margin = "5px";
     document.getElementById("generatedMemeGallery").appendChild(thumbImg);
+    const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
+saved.push(thumbImg.src);
+localStorage.setItem("generatedMemes", JSON.stringify(saved));
+
+
+    
   };
 }
 
@@ -847,23 +857,18 @@ function loadQuotes() {
   saved.forEach(q => quoteList.push(q));
 }
 
-    window.onload = function () {
+window.onload = function () {
   loadQuotes();
   renderQuotes();
   updateTopQuotes();
-      loadCrushes();
-renderCrushes();
+
+  loadCrushes();
+  renderCrushes();
 
   const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
   savedMemes.forEach(meme => memeImages.push(meme));
   renderMemeGallery();
   renderMemeCollections();
-};
-
-
-  const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
-  savedMemes.forEach(meme => memeImages.push(meme));
-  renderMemeGallery();
 };
 
 
