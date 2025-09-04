@@ -220,39 +220,33 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 248, 240, 0.95);
+  background: rgba(0, 0, 0, 0.2); /* ✅ subtle gray backdrop */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
+  overflow: auto;
 }
 
 .modal-content {
   position: relative;
+  background: #fff8f0;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
   max-width: 90%;
   max-height: 90%;
 }
 
-.modal-content img {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
-.close-button {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  font-size: 18px;
-  background: #a1887f;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-
-    .use-image-button {
+.close-button,
+.use-image-button {
   background-color: #a1887f;
   color: white;
   border: none;
@@ -360,9 +354,9 @@
   </div>
 
 <!-- Modal Viewer -->
-<div id="memeModal" class="modal" style="display:none;">
+<div id="memeModal" class="modal">
   <div class="modal-content">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <div class="modal-header">
       <span id="closeModal" class="close-button">⬅️ Back</span>
       <button id="useModalImage" class="use-image-button">Use this image</button>
     </div>
@@ -398,9 +392,14 @@ function openModal(src) {
   document.getElementById("useModalImage").onclick = () => {
     selectedMemeURL = src;
     document.getElementById("memeModal").style.display = "none";
-    generateMeme(); // ✅ Immediately show it in the canvas
+    generateMeme();
   };
+
+  setTimeout(() => {
+    document.getElementById("memeModal").scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 100);
 }
+
 
 
 document.getElementById("closeModal").onclick = () => {
@@ -657,10 +656,10 @@ function generateMeme() {
   const ctx = canvas.getContext("2d");
   const topText = document.getElementById("topText").value;
   const bottomText = document.getElementById("bottomText").value;
-const memeImg = new Image();
-memeImg.crossOrigin = "anonymous";
-memeImg.src = selectedMemeURL || memeImages[Math.floor(Math.random() * memeImages.length)].url;
 
+  const memeImg = new Image();
+  memeImg.crossOrigin = "anonymous";
+  memeImg.src = selectedMemeURL || memeImages[Math.floor(Math.random() * memeImages.length)].url;
 
   memeImg.onload = function () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -680,20 +679,20 @@ memeImg.src = selectedMemeURL || memeImages[Math.floor(Math.random() * memeImage
     canvasCopy.height = 120;
     const ctxCopy = canvasCopy.getContext("2d");
     ctxCopy.drawImage(canvas, 0, 0, 120, 120);
+
     const thumbImg = new Image();
     thumbImg.src = canvasCopy.toDataURL("image/png");
     thumbImg.style.borderRadius = "8px";
     thumbImg.style.margin = "5px";
     document.getElementById("generatedMemeGallery").appendChild(thumbImg);
+
     const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
-saved.push(thumbImg.src);
-localStorage.setItem("generatedMemes", JSON.stringify(saved));
-renderMemeCollections(); 
-
-
-    
+    saved.push(thumbImg.src);
+    localStorage.setItem("generatedMemes", JSON.stringify(saved));
+    renderMemeCollections();
   };
 }
+
 
 
 function generateRandomMeme() {
