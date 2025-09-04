@@ -38,24 +38,27 @@
   }
 
   button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    background-color: #a1887f;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-  }
+  height: 42px; 
+  padding: 0 20px; 
+  background-color: #a1887f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  white-space: nowrap;
+}
 
   #confessionExpiry {
-    padding: 10px;
-    border-radius: 6px;
-    border: none;
-    background-color: #a1887f;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-  }
+  height: 42px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: none;
+  background-color: #a1887f;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
 
   #customFile {
     margin-top: 10px;
@@ -190,6 +193,64 @@
     position: relative;
     overflow-x: visible;
   }
+
+
+    .gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gallery-grid img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.gallery-grid img:hover {
+  transform: scale(1.05);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 248, 240, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+}
+
+.modal-content img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.close-button {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  font-size: 18px;
+  background: #a1887f;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 </style>
 
 </head>
@@ -273,10 +334,27 @@
     
 </div>
 
-  <div style="margin-top:30px;">
-  <h4>🖼️ Meme Gallery</h4>
-  <div id="generatedMemeGallery" class="scrollable-box" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
-    <button onclick="clearMemeGallery()" style="margin-top:10px; background:#d32f2f;">🗑️ Clear Gallery</button>
+  <div class="section">
+  <!-- Meme Gallery -->
+  <div class="column">
+    <h3>🖼️ Meme Gallery (Templates)</h3>
+    <div id="memeGallery" class="scrollable-box gallery-grid"></div>
+  </div>
+
+  <!-- Meme Collections -->
+  <div class="column">
+    <h3>🎨 Meme Collections (Creations)</h3>
+    <div id="memeCollections" class="scrollable-box gallery-grid"></div>
+  </div>
+</div>
+
+<!-- Modal Viewer -->
+<div id="memeModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span id="closeModal" class="close-button">⬅️ Back</span>
+    <img id="modalImage" src="" alt="Meme Preview" />
+  </div>
+</div>
 
 </div>
 
@@ -658,7 +736,7 @@ function saveCustomMeme(url, top, bottom) {
   savedMemes.push(newMeme);
   localStorage.setItem("studentMemes", JSON.stringify(savedMemes));
 
-  alert("✅ Meme template added! Try Random Meme to see it.");
+  alert(" ✓ Meme template added! Try Random Meme to see it.");
   document.getElementById("customUrl").value = "";
   document.getElementById("customTop").value = "";
   document.getElementById("customBottom").value = "";
@@ -668,22 +746,71 @@ function saveCustomMeme(url, top, bottom) {
 }
 
     function renderMemeGallery() {
-  const gallery = document.getElementById("generatedMemeGallery");
+  const gallery = document.getElementById("memeGallery");
   gallery.innerHTML = "";
-  const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
-  savedMemes.forEach(meme => {
-    const img = document.createElement("img");
+  memeImages.forEach((meme, index) => {
+    const wrapper = document.createElement("div");
+
+    const img = new Image();
     img.src = meme.url;
-    img.alt = "Student Meme";
-    img.style.width = "120px";
-    img.style.height = "120px";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "8px";
+    img.alt = "Meme Template";
     img.title = `${meme.top} / ${meme.bottom}`;
-    gallery.appendChild(img);
+    img.onclick = () => openModal(meme.url);
+
+    const useBtn = document.createElement("button");
+    useBtn.textContent = "Use this image";
+    useBtn.style.marginTop = "5px";
+    useBtn.onclick = () => {
+      document.getElementById("topText").value = meme.top || "";
+      document.getElementById("bottomText").value = meme.bottom || "";
+      selectedMemeURL = meme.url;
+    };
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(useBtn);
+    gallery.appendChild(wrapper);
   });
 }
 
+    function renderMemeCollections() {
+  const gallery = document.getElementById("memeCollections");
+  gallery.innerHTML = "";
+  const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
+
+  saved.forEach((src, index) => {
+    const wrapper = document.createElement("div");
+
+    const img = new Image();
+    img.src = src;
+    img.alt = "Generated Meme";
+    img.onclick = () => openModal(src);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Remove";
+    deleteBtn.style.marginTop = "5px";
+    deleteBtn.style.background = "#8d6e63"; // cozy brown
+    deleteBtn.onclick = () => {
+      saved.splice(index, 1);
+      localStorage.setItem("generatedMemes", JSON.stringify(saved));
+      renderMemeCollections();
+    };
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(deleteBtn);
+    gallery.appendChild(wrapper);
+  });
+}
+
+    function openModal(src) {
+  document.getElementById("modalImage").src = src;
+  document.getElementById("memeModal").style.display = "flex";
+}
+
+document.getElementById("closeModal").onclick = () => {
+  document.getElementById("memeModal").style.display = "none";
+};
+
+    
     function toggleMemeInput() {
   const urlInput = document.getElementById("customUrl");
   const fileInput = document.getElementById("customFile");
@@ -726,6 +853,12 @@ function loadQuotes() {
   updateTopQuotes();
       loadCrushes();
 renderCrushes();
+
+  const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
+  savedMemes.forEach(meme => memeImages.push(meme));
+  renderMemeGallery();
+  renderMemeCollections();
+};
 
 
   const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
