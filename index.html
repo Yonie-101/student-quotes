@@ -182,7 +182,20 @@
     <div class="column">
       <h3>Hidden Feelings 💕</h3>
       <input type="text" id="crushInput" placeholder="Got a secret crush?" />
-      <button onclick="postCrush()">Post Confession</button>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+  <select id="confessionExpiry" style="flex: 1;">
+    <option value="">⏳ Select expiry time</option>
+    <option value="5">5 minutes</option>
+    <option value="15">15 minutes</option>
+    <option value="30">30 minutes</option>
+    <option value="60">1 hour</option>
+    <option value="300">5 hours</option>
+    <option value="1440">1 day</option>
+  </select>
+  <button onclick="postCrush()" style="white-space: nowrap;">Post Confession</button>
+</div>
+
+      
 <div id="crushList" class="scrollable-box"></div>
     </div>
   </div>
@@ -292,14 +305,40 @@ function generateRandomQuote() {
 
 
     function postCrush() {
-      const input = document.getElementById("crushInput");
-      const text = input.value.trim();
-      if (text) {
-        crushList.push(text);
-        input.value = "";
-        renderCrushes();
-      }
-    }
+  const input = document.getElementById("crushInput");
+  const text = input.value.trim();
+  const expiry = document.getElementById("confessionExpiry").value;
+
+  if (!text || !expiry) {
+    alert("⚠️ Please enter a confession and select an expiry time.");
+    return;
+  }
+
+  const timestamp = Date.now();
+  const expiresAt = timestamp + parseInt(expiry) * 60 * 1000;
+  const entry = { text, expiresAt };
+
+  crushList.push(entry);
+  saveCrushes();
+  input.value = "";
+  document.getElementById("confessionExpiry").value = "";
+  renderCrushes();
+}
+
+
+    function saveCrushes() {
+  localStorage.setItem("studentCrushes", JSON.stringify(crushList));
+}
+
+function loadCrushes() {
+  const saved = JSON.parse(localStorage.getItem("studentCrushes") || "[]");
+  const now = Date.now();
+  crushList.length = 0;
+  saved.forEach(c => {
+    if (c.expiresAt > now) crushList.push(c);
+  });
+}
+
 
     function reactToQuote(index, emoji) {
   quoteList[index].selectedReaction = emoji;
@@ -314,58 +353,80 @@ function generateRandomQuote() {
   });
 }
 
-
-    function renderQuotes() {
+function renderQuotes() {
   const container = document.getElementById("quoteList");
   container.innerHTML = "";
+
   quoteList.forEach((q, i) => {
     const div = document.createElement("div");
     div.className = "entry";
+    div.style.position = "relative";
 
     const selected = q.selectedReaction || null;
 
+    // Quote text
+    div.innerHTML = `<strong>${q.text}</strong>`;
+
+    // Reaction circle (bottom-left)
+    const circle = document.createElement("div");
+    circle.className = "reaction-circle";
+    const activeReacts = Object.entries(q.reacts)
+      .filter(([_, count]) => count > 0)
+      .slice(0, 3);
+    circle.textContent = activeReacts.map(([r]) => r).join(" ");
+    div.appendChild(circle);
+
+    // Reaction buttons
     const reactionDiv = document.createElement("div");
     reactionDiv.className = "reactions";
     if (selected) reactionDiv.setAttribute("data-selected", "true");
-
-
-    const circle = document.createElement("div");
-circle.className = "reaction-circle";
-const activeReacts = Object.entries(q.reacts).filter(([_, count]) => count > 0).slice(0, 3);
-circle.textContent = activeReacts.map(([r]) => r).join(" ");
-div.style.position = "relative";
-div.appendChild(circle);
 
     reactions.forEach(r => {
       const span = document.createElement("span");
       span.textContent = r;
       if (selected === r) span.setAttribute("data-active", "true");
-      span.onclick = () => {
+
+      span.onclick = (e) => {
         q.selectedReaction = r;
         q.reacts[r]++;
+        saveQuotes(); 
         renderQuotes();
         updateTopQuotes();
+        triggerEmojiBurst(r, e.clientX, e.clientY);
       };
+
       reactionDiv.appendChild(span);
     });
 
-    div.innerHTML = `<strong>${q.text}</strong>`;
     div.appendChild(reactionDiv);
     container.appendChild(div);
   });
 }
 
 
+function triggerEmojiBurst(emoji, x, y) {
+  const burst = document.createElement("div");
+  burst.className = "emoji-burst";
+  burst.textContent = emoji;
+  burst.style.left = `${x}px`;
+  burst.style.top = `${y}px`;
+  document.getElementById("emojiBurstContainer").appendChild(burst);
+  setTimeout(() => burst.remove(), 1000);
+}
+
+
+    
     function renderCrushes() {
-      const container = document.getElementById("crushList");
-      container.innerHTML = "";
-      crushList.forEach(c => {
-        const div = document.createElement("div");
-        div.className = "entry";
-        div.innerHTML = `<em>${c}</em>`;
-        container.appendChild(div);
-      });
-    }
+  const container = document.getElementById("crushList");
+  container.innerHTML = "";
+  crushList.forEach(c => {
+    const div = document.createElement("div");
+    div.className = "entry";
+    div.innerHTML = `<em>${c.text}</em>`;
+    container.appendChild(div);
+  });
+}
+
 
     function updateTopQuotes() {
       const sorted = [...quoteList].sort((a, b) => {
@@ -598,17 +659,6 @@ function saveCustomMeme(url, top, bottom) {
   });
 }
 
-    function triggerEmojiBurst(emoji, x, y) {
-  const burst = document.createElement("div");
-  burst.className = "emoji-burst";
-  burst.textContent = emoji;
-  burst.style.left = `${x}px`;
-  burst.style.top = `${y}px`;
-  document.getElementById("emojiBurstContainer").appendChild(burst);
-  setTimeout(() => burst.remove(), 1000);
-}
-
-    
     function toggleMemeInput() {
   const urlInput = document.getElementById("customUrl");
   const fileInput = document.getElementById("customFile");
@@ -642,6 +692,9 @@ function loadQuotes() {
   loadQuotes();
   renderQuotes();
   updateTopQuotes();
+      loadCrushes();
+renderCrushes();
+
 
   const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
   savedMemes.forEach(meme => memeImages.push(meme));
