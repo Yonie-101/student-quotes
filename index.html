@@ -187,18 +187,15 @@
   }
 
   .scrollable-box {
-    max-height: 300px;
-    overflow-y: auto;
-    padding-right: 10px;
-    position: relative;
-    overflow-x: visible;
-  }
-
+  max-height: none; /* or increase height */
+  overflow-y: auto;
+}
 
     .gallery-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  min-height: 120px; /* ensures it doesn't collapse */
 }
 
 .gallery-grid img {
@@ -262,6 +259,22 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+}
+
+    .modal-content img {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  border-radius: 12px;
+}
+
+.modal {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal[style*="display: flex"] {
+  opacity: 1;
 }
 
     
