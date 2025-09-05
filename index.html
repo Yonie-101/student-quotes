@@ -420,6 +420,10 @@
   <div id="coffeeTriviaModal" style="display:none; position:fixed; top:20px; right:20px; background-color:#ffeaa7; border:1px solid #dfe6e9; padding:10px 20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.2); font-weight:bold; color:#2d3436; font-family:'Segoe UI', sans-serif;">
 </div>
 
+
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
+  
   <script>
     
 let selectedMemeURL = null;
@@ -466,16 +470,19 @@ function openCollectionModal(src) {
     function postQuote() {
   const input = document.getElementById("quoteInput");
   const text = input.value.trim();
-  if (text) {
-    const entry = { text, reacts: {}, selectedReaction: null };
-    reactions.forEach(r => entry.reacts[r] = 0);
-    quoteList.push(entry);
-    input.value = "";
-    saveQuotes();
-    renderQuotes();
-    updateTopQuotes();
-  }
+  if (!text) return;
+
+  const entry = {
+    text,
+    reacts: { "❤️": 0, "😆": 0, "😢": 0, "😮": 0, "😡": 0 },
+    selectedReaction: null,
+    timestamp: Date.now()
+  };
+
+  db.ref("quotes").push(entry);
+  input.value = "";
 }
+
 
 
     const randomQuotes = [
@@ -620,14 +627,13 @@ function generateRandomQuote() {
   }
 
   const timestamp = Date.now();
-  const expiresAt = timestamp + parseInt(expiry) * 60 * 1000;
-  const entry = { text, expiresAt };
+  const expiresAt = timestamp + parseFloat(expiry) * 60 * 1000;
 
-  crushList.push(entry);
-  saveCrushes();
+  const entry = { text, expiresAt, timestamp };
+
+  db.ref("confessions").push(entry);
   input.value = "";
   document.getElementById("confessionExpiry").value = "";
-  renderCrushes();
 }
 
     function saveCrushes() {
@@ -643,68 +649,72 @@ function loadCrushes() {
   localStorage.setItem("studentCrushes", JSON.stringify(valid));
 }
 
-  function reactToQuote(index, emoji) {
-  quoteList[index].selectedReaction = emoji;
-  quoteList[index].reacts[emoji]++;
-  renderQuotes();
-  updateTopQuotes();
+  function reactToQuote(quoteId, emoji) {
+  const reactionRef = db.ref(`quotes/${quoteId}/reacts/${emoji}`);
+  reactionRef.transaction(current => (current || 0) + 1);
 
-  // Get mouse position for burst
   document.addEventListener("click", function burstHandler(e) {
     triggerEmojiBurst(emoji, e.clientX, e.clientY);
     document.removeEventListener("click", burstHandler);
   });
 }
 
+
 function renderQuotes() {
   const container = document.getElementById("quoteList");
   container.innerHTML = "";
 
-  quoteList.forEach((q, i) => {
-    const div = document.createElement("div");
-    div.className = "entry";
-    div.style.position = "relative";
+  db.ref("quotes").on("value", snapshot => {
+    container.innerHTML = "";
 
-    const selected = q.selectedReaction || null;
+    snapshot.forEach(child => {
+      const q = child.val();
+      const quoteId = child.key;
+      const selected = q.selectedReaction || null;
 
-    // Quote text
-    div.innerHTML = `<strong>${q.text}</strong>`;
+      const div = document.createElement("div");
+      div.className = "entry";
+      div.style.position = "relative";
 
-    // Reaction circle (bottom-left)
-    const circle = document.createElement("div");
-    circle.className = "reaction-circle";
-    const activeReacts = Object.entries(q.reacts)
-      .filter(([_, count]) => count > 0)
-      .slice(0, 3);
-    circle.textContent = activeReacts.map(([r]) => r).join(" ");
-    div.appendChild(circle);
+      // Quote text
+      div.innerHTML = `<strong>${q.text}</strong>`;
 
-    // Reaction buttons
-    const reactionDiv = document.createElement("div");
-    reactionDiv.className = "reactions";
-    if (selected) reactionDiv.setAttribute("data-selected", "true");
+      // Reaction circle (bottom-left)
+      const circle = document.createElement("div");
+      circle.className = "reaction-circle";
+      const activeReacts = Object.entries(q.reacts || {})
+        .filter(([_, count]) => count > 0)
+        .slice(0, 3);
+      circle.textContent = activeReacts.map(([r]) => r).join(" ");
+      div.appendChild(circle);
 
-    reactions.forEach(r => {
-      const span = document.createElement("span");
-      span.textContent = r;
-      if (selected === r) span.setAttribute("data-active", "true");
+      // Reaction buttons
+      const reactionDiv = document.createElement("div");
+      reactionDiv.className = "reactions";
+      if (selected) reactionDiv.setAttribute("data-selected", "true");
 
-      span.onclick = (e) => {
-        q.selectedReaction = r;
-        q.reacts[r]++;
-        saveQuotes(); 
-        renderQuotes();
-        updateTopQuotes();
-        triggerEmojiBurst(r, e.clientX, e.clientY);
-      };
+      reactions.forEach(r => {
+        const span = document.createElement("span");
+        span.textContent = r;
+        if (selected === r) span.setAttribute("data-active", "true");
 
-      reactionDiv.appendChild(span);
+        span.onclick = (e) => {
+          // Update selectedReaction and increment count in Firebase
+          db.ref(`quotes/${quoteId}/selectedReaction`).set(r);
+          db.ref(`quotes/${quoteId}/reacts/${r}`).transaction(current => (current || 0) + 1);
+
+          triggerEmojiBurst(r, e.clientX, e.clientY);
+        };
+
+        reactionDiv.appendChild(span);
+      });
+
+      div.appendChild(reactionDiv);
+      container.appendChild(div);
     });
-
-    div.appendChild(reactionDiv);
-    container.appendChild(div);
   });
 }
+
 
 function triggerEmojiBurst(emoji, x, y) {
   const burst = document.createElement("div");
@@ -717,15 +727,25 @@ function triggerEmojiBurst(emoji, x, y) {
 }
 
     function renderCrushes() {
-  const container = document.getElementById("crushList");
-  container.innerHTML = "";
-  crushList.forEach(c => {
-    const div = document.createElement("div");
-    div.className = "entry";
-    div.innerHTML = `<em>${c.text}</em>`;
-    container.appendChild(div);
+  const crushListEl = document.getElementById("crushList");
+  crushListEl.innerHTML = "";
+
+  db.ref("confessions").on("value", snapshot => {
+    crushListEl.innerHTML = "";
+    const now = Date.now();
+
+    snapshot.forEach(child => {
+      const crush = child.val();
+      if (crush.expiresAt > now) {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.textContent = crush.text;
+        crushListEl.appendChild(div);
+      }
+    });
   });
 }
+
 
     function updateTopQuotes() {
       const sorted = [...quoteList].sort((a, b) => {
@@ -1086,7 +1106,23 @@ window.onload = function () {
   renderMemeCollections();
 };
 
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD9B8m_cJ2kXQuwoliL3WAowC-hFgPBjBg",
+  authDomain: "student-cozy-corner.firebaseapp.com",
+  databaseURL: "https://student-cozy-corner-default-rtdb.firebaseio.com",
+  projectId: "student-cozy-corner",
+  storageBucket: "student-cozy-corner.appspot.com",
+  messagingSenderId: "436355859247",
+  appId: "1:436355859247:web:a98f51fb48219596ad57da"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+
 </script>
+  
   <div id="emojiBurstContainer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden;"></div>
   </body>
 </html>
