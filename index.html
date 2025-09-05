@@ -291,7 +291,6 @@
   opacity: 1;
 }
 
-    
 </style>
 
 </head>
@@ -324,7 +323,6 @@
   </select>
   <button onclick="postCrush()" style="white-space: nowrap;">Post Confession</button>
 </div>
-
       
 <div id="crushList" class="scrollable-box"></div>
     </div>
@@ -334,11 +332,6 @@
     <h3>Top Reacted Quotes</h3>
     <ol id="topQuotes"></ol>
   </div>
-
-
-
-
-
   
   <div class="minigames">
     <h3>Minigames</h3>
@@ -376,10 +369,6 @@
 
   </div>
 
-    
-
-
-    
 </div>
 
   <div class="section">
@@ -394,8 +383,6 @@
   <h3>🎨 Meme Collections (Creations)</h3>
 <div id="memeCollections" class="scrollable-box gallery-grid" style="max-height: 300px;"></div>
 </div>
-
-
 
     </div>
 
@@ -417,9 +404,6 @@
     <img id="collectionModalImage" src="" alt="Generated Meme Preview" />
   </div>
 
-
-
-  
 </div> 
 </div> 
 
@@ -433,14 +417,11 @@
   <button onclick="submitCustomMeme()" style="width:100%;">Add to Meme List</button>
 </div>
 
-
-
   <div id="coffeeTriviaModal" style="display:none; position:fixed; top:20px; right:20px; background-color:#ffeaa7; border:1px solid #dfe6e9; padding:10px 20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.2); font-weight:bold; color:#2d3436; font-family:'Segoe UI', sans-serif;">
 </div>
 
-
   <script>
-
+    
 let selectedMemeURL = null;
 
 function openCollectionModal(src) {
@@ -478,13 +459,6 @@ function openCollectionModal(src) {
 }
 
 
-  
-
-
-
-
-    
-    
     const quoteList = [];
     const crushList = [];
     const reactions = ["❤️", "😆", "😢", "😮", "😡"];
@@ -519,15 +493,13 @@ function openCollectionModal(src) {
   { text: "You can't pour from an empty cup. Refill with coffee first.", author: "Self-Care Society" },
   { text: "Group projects: where your silence is louder than your effort.", author: "Reality Hurts" },
   { text: "Sleep is for the weak. Coffee is for the finals.", author: "Yeon" },
-  { text: "I’m not procrastinating. I’m marinating in potential.", author: "Student Logic" }
+  { text: "I’m not procrastinating. I’m marinating in potential.", author: "Student Logic" },  
   { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
   { text: "Do not wait for the perfect moment. Take the moment and make it perfect.", author: "Zoey Sayward" },
   { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
   { text: "Happiness is not something ready made. It comes from your own actions.", author: "Dalai Lama" },
   { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" }
 ];
-
-
 
     const coffeeQuiz = [
   {
@@ -582,7 +554,6 @@ function openCollectionModal(src) {
   }
 ];
 
-
 let lattePoints = 0;
 let currentCoffeeQuestion = null;
 
@@ -632,17 +603,11 @@ function resetLattePoints() {
   document.getElementById("quizFeedback").textContent = "🔄 Latte Points reset!";
   document.getElementById("quizFeedback").style.color = "#6d4c41";
 }
-
-
-
-
-
     
 function generateRandomQuote() {
   const pick = randomQuotes[Math.floor(Math.random() * randomQuotes.length)];
   document.getElementById("quoteInput").value = `"${pick.text}" — ${pick.author}`;
 }
-
 
     function postCrush() {
   const input = document.getElementById("crushInput");
@@ -665,7 +630,6 @@ function generateRandomQuote() {
   renderCrushes();
 }
 
-
     function saveCrushes() {
   localStorage.setItem("studentCrushes", JSON.stringify(crushList));
 }
@@ -679,9 +643,7 @@ function loadCrushes() {
   localStorage.setItem("studentCrushes", JSON.stringify(valid));
 }
 
-
-
-    function reactToQuote(index, emoji) {
+  function reactToQuote(index, emoji) {
   quoteList[index].selectedReaction = emoji;
   quoteList[index].reacts[emoji]++;
   renderQuotes();
@@ -744,7 +706,6 @@ function renderQuotes() {
   });
 }
 
-
 function triggerEmojiBurst(emoji, x, y) {
   const burst = document.createElement("div");
   burst.className = "emoji-burst";
@@ -755,8 +716,6 @@ function triggerEmojiBurst(emoji, x, y) {
   setTimeout(() => burst.remove(), 1000);
 }
 
-
-    
     function renderCrushes() {
   const container = document.getElementById("crushList");
   container.innerHTML = "";
@@ -767,7 +726,6 @@ function triggerEmojiBurst(emoji, x, y) {
     container.appendChild(div);
   });
 }
-
 
     function updateTopQuotes() {
       const sorted = [...quoteList].sort((a, b) => {
@@ -900,8 +858,6 @@ function generateMeme() {
 };
 }
 
-
-
 function generateRandomMeme() {
   selectedMemeURL = null;
   const randomIndex = Math.floor(Math.random() * memeImages.length);
@@ -909,7 +865,6 @@ function generateRandomMeme() {
   document.getElementById("bottomText").value = memeImages[randomIndex].bottom;
   generateMeme();
 }
-
 
     const coffeeTrivia = [
   "🦷☕ Coffee was originally chewed, not sipped! Early tribes ground the beans and mixed them with fat to make energy bites.",
@@ -927,7 +882,6 @@ function generateRandomMeme() {
   "👀📹 The first webcam was invented to monitor a coffee pot at Cambridge University. Because hallway disappointment is real.",
   "🍷🕊️ Coffee was once called the 'wine of Islam' — praised for its energizing effects and used in spiritual rituals before going global."
 ];
-
 
 function showCoffeeTrivia() {
   const modal = document.getElementById("coffeeTriviaModal");
@@ -1007,8 +961,6 @@ function saveCustomMeme(url, top, bottom) {
     gallery.appendChild(img);
   });
 }
-
-
     function openGalleryModal(src) {
   document.getElementById("galleryModalImage").src = src;
   document.getElementById("galleryModal").style.display = "flex";
@@ -1027,7 +979,6 @@ function saveCustomMeme(url, top, bottom) {
     document.getElementById("galleryModal").scrollIntoView({ behavior: "smooth", block: "center" });
   }, 100);
 }
-
 
     function renderMemeCollections() {
   const gallery = document.getElementById("memeCollections");
@@ -1085,8 +1036,6 @@ function saveCustomMeme(url, top, bottom) {
     document.getElementById("collectionModal").scrollIntoView({ behavior: "smooth", block: "center" });
   }, 100);
 }
-
-
     
     function toggleMemeInput() {
   const urlInput = document.getElementById("customUrl");
@@ -1106,15 +1055,12 @@ function saveCustomMeme(url, top, bottom) {
   }
 }
 
-
 function memeCollections() {
   if (confirm("Are you sure you want to clear all memes from the collection?")) {
     localStorage.setItem("generatedMemes", JSON.stringify([]));
     renderMemeCollections();
   }
 }
-
-
 
     function saveQuotes() {
   localStorage.setItem("studentQuotes", JSON.stringify(quoteList));
@@ -1140,14 +1086,8 @@ window.onload = function () {
   renderMemeCollections();
 };
 
-
-
-
 </script>
-
   <div id="emojiBurstContainer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden;"></div>
-  
-
-</body>
+  </body>
 </html>
 
