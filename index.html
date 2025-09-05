@@ -860,6 +860,26 @@ function saveCustomMeme(url, top, bottom) {
 }
 
 
+    function openGalleryModal(src) {
+  document.getElementById("galleryModalImage").src = src;
+  document.getElementById("galleryModal").style.display = "flex";
+
+  document.getElementById("useModalImage").onclick = () => {
+    selectedMemeURL = src;
+    document.getElementById("galleryModal").style.display = "none";
+    generateMeme();
+  };
+
+  document.getElementById("closeGalleryModal").onclick = () => {
+    document.getElementById("galleryModal").style.display = "none";
+  };
+
+  setTimeout(() => {
+    document.getElementById("galleryModal").scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 100);
+}
+
+
     function renderMemeCollections() {
   const gallery = document.getElementById("memeCollections");
   gallery.innerHTML = "";
