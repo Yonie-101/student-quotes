@@ -186,9 +186,19 @@
     }
   }
 
-  .scrollable-box {
-  max-height: none; /* or increase height */
+.scrollable-box {
+  max-height: 300px;
   overflow-y: auto;
+  padding-right: 10px;
+}
+
+.scrollable-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-box::-webkit-scrollbar-thumb {
+  background-color: #a1887f;
+  border-radius: 4px;
 }
 
     .gallery-grid {
@@ -363,16 +373,18 @@
 
   <div class="section">
   <!-- Meme Gallery -->
-  <div class="column">
-    <h3>🖼️ Meme Gallery (Templates)</h3>
-    <div id="memeGallery" class="scrollable-box gallery-grid"></div>
-  </div>
+<div class="column">
+  <h3>🖼️ Meme Gallery (Templates)</h3>
+<div id="memeGallery" class="scrollable-box gallery-grid" style="max-height: 300px;"></div>
+</div>
 
-  <!-- Meme Collections -->
-  <div class="column">
-    <h3>🎨 Meme Collections (Creations)</h3>
-    <div id="memeCollections" class="scrollable-box gallery-grid"></div>
-  </div>
+<!-- Meme Collections -->
+<div class="column">
+  <h3>🎨 Meme Collections (Creations)</h3>
+<div id="memeCollections" class="scrollable-box gallery-grid" style="max-height: 300px;"></div>
+</div>
+
+
 
     </div>
 
