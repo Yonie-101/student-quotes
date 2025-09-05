@@ -403,7 +403,7 @@
 <div id="galleryModal" class="modal" style="display:none;">
   <div class="modal-content">
     <div class="modal-header">
-      <span id="closeGalleryModal" class="close-button">⬅️ Back</span>
+      <span id="closeGalleryModal" class="close-button">Back</span>
       <button id="useModalImage" class="use-image-button">Use this image</button>
     </div>
     <img id="galleryModalImage" src="" alt="Meme Preview" />
@@ -420,9 +420,8 @@
 
 
   
-<!-- Close the modal properly -->
-</div> <!-- closes .modal-content -->
-</div> <!-- closes #collectionModal -->
+</div> 
+</div> 
 
 <div style="margin-top:30px; background:#fff3e0; padding:20px; border-radius:12px;">
   <h4>📤 Submit Your Own Meme Template</h4>
@@ -453,7 +452,7 @@ function openCollectionModal(src) {
 
   const backBtn = document.createElement("span");
   backBtn.className = "close-button";
-  backBtn.textContent = "⬅️ Back";
+  backBtn.textContent = "Back";
   backBtn.onclick = () => {
     document.getElementById("collectionModal").style.display = "none";
   };
@@ -914,12 +913,12 @@ function generateRandomMeme() {
 
     const coffeeTrivia = [
   "🦷☕ Coffee was originally chewed, not sipped! Early tribes ground the beans and mixed them with fat to make energy bites.",
-  "🔧🇮🇹 Espresso means 'pressed out' in Italian — it’s all about brewing under pressure, not the bean itself.",
+  "🔧🫘 Espresso means 'pressed out' in Italian — it’s all about brewing under pressure, not the bean itself.",
   "📹☕ The first webcam was invented to monitor a coffee pot at Cambridge University. No one wanted to walk across the hall for an empty pot!",
   "🌍🕌 The word 'coffee' comes from the Arabic 'qahwa', which originally referred to wine — poetic and energizing.",
   "🍒🌱 Coffee is technically a fruit! The beans we brew are seeds from a cherry-like fruit that grows on coffee trees.",
   "😴⚡ Decaf doesn’t mean caffeine-free — it still contains 1–2% caffeine. Enough to keep your eyelids twitching during finals.",
-  "🇫🇮☕ Finland drinks the most coffee per capita in the world — averaging four cups a day. Cozy culture goals!",
+  "🫘☕ Finland drinks the most coffee per capita in the world — averaging four cups a day. Cozy culture goals!",
   "📜🚫 Coffee was almost lost to history — banned in Mecca in the 1500s for 'stimulating radical thinking.' Luckily, the ban didn’t stick.",
   "💧☕ Contrary to myth, coffee won’t dehydrate you. It’s mostly water, and moderate sipping actually helps hydration.",
   "🫘💨 Espresso isn’t a type of bean — it’s a brewing method. Any bean can be espresso if brewed with pressure.",
@@ -1062,7 +1061,7 @@ function saveCustomMeme(url, top, bottom) {
 
   const backBtn = document.createElement("span");
   backBtn.className = "close-button";
-  backBtn.textContent = "⬅️ Back";
+  backBtn.textContent = "Back";
   backBtn.onclick = () => {
     document.getElementById("collectionModal").style.display = "none";
   };
