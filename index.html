@@ -384,13 +384,15 @@
 
 
   
+<!-- Close the modal properly -->
+</div> <!-- closes .modal-content -->
+</div> <!-- closes #collectionModal -->
 
-
-  <div style="margin-top:30px; background:#fff3e0; padding:20px; border-radius:12px;">
+<!-- ✅ Now place your Submit Meme section here -->
+<div style="margin-top:30px; background:#fff3e0; padding:20px; border-radius:12px;">
   <h4>📤 Submit Your Own Meme Template</h4>
-    <button onclick="toggleMemeInput()">Switch to File Upload</button>
-<input type="file" id="customFile" style="display:none; margin-top:10px;" />
-
+  <button onclick="toggleMemeInput()">Switch to File Upload</button>
+  <input type="file" id="customFile" style="display:none; margin-top:10px;" />
   <input type="text" id="customUrl" placeholder="Image URL" style="width:100%; margin-bottom:10px;" />
   <input type="text" id="customTop" placeholder="Top text" style="width:100%; margin-bottom:10px;" />
   <input type="text" id="customBottom" placeholder="Bottom text" style="width:100%; margin-bottom:10px;" />
@@ -963,8 +965,7 @@ window.onload = function () {
 
   <div id="emojiBurstContainer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden;"></div>
   
-</div> <!-- closes collectionModal .modal-content -->
-</div> <!-- closes collectionModal -->
+
 </body>
 </html>
 
