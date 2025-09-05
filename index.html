@@ -300,9 +300,12 @@
   <div class="section">
     <div class="column">
       <h3>Student Quotes</h3>
-      <input type="text" id="quoteInput" placeholder="Share a cozy thought..." />
-      <button onclick="postQuote()">Post Quote</button>
-      <button onclick="generateRandomQuote()">🎲 Random Quote</button>
+      <input type="text" id="quoteInput" placeholder="Share a cozy thought..." style="margin-bottom: 10px;" />
+<div style="display: flex; gap: 10px;">
+  <button onclick="postQuote()">Post Quote</button>
+  <button onclick="generateRandomQuote()">🎲 Random Quote</button>
+</div>
+
   <div id="quoteList" class="scrollable-box"></div>
     </div>
     <div class="column">
