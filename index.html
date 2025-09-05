@@ -115,7 +115,7 @@
   .reaction-circle {
     position: absolute;
     bottom: -10px;
-    left: 10px; 
+    left: 10px; /* ✅ nudged inward to avoid scroll clipping */
     background: #ffeaa7;
     border-radius: 50%;
     padding: 6px;
@@ -220,33 +220,39 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.2); 
+  background: rgba(255, 248, 240, 0.95);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
-  overflow: auto;
 }
 
 .modal-content {
   position: relative;
-  background: #fff8f0;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
   max-width: 90%;
   max-height: 90%;
 }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+.modal-content img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
 }
 
-.close-button,
-.use-image-button {
+.close-button {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  font-size: 18px;
+  background: #a1887f;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+
+    .use-image-button {
   background-color: #a1887f;
   color: white;
   border: none;
@@ -254,14 +260,6 @@
   padding: 8px 12px;
   font-size: 16px;
   cursor: pointer;
-}
-
-
-    #collectionModalHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
 }
 
     
@@ -360,31 +358,20 @@
     <h3>🎨 Meme Collections (Creations)</h3>
     <div id="memeCollections" class="scrollable-box gallery-grid"></div>
   </div>
+</div>
 
-    </div>
-
-<!-- Modal for Meme Gallery -->
-<div id="galleryModal" class="modal" style="display:none;">
+<!-- Modal Viewer -->
+<div id="memeModal" class="modal" style="display:none;">
   <div class="modal-content">
-    <div class="modal-header">
-      <span id="closeGalleryModal" class="close-button">⬅️ Back</span>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span id="closeModal" class="close-button">⬅️ Back</span>
       <button id="useModalImage" class="use-image-button">Use this image</button>
     </div>
-    <img id="galleryModalImage" src="" alt="Meme Preview" />
+    <img id="modalImage" src="" alt="Meme Preview" />
   </div>
 </div>
 
-<!-- Modal for Meme Collections -->
-<div id="collectionModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <div class="modal-header" id="collectionModalHeader"></div>
-    <img id="collectionModalImage" src="" alt="Generated Meme Preview" />
-  </div>
-
-
-
-  
-
+</div>
 
   <div style="margin-top:30px; background:#fff3e0; padding:20px; border-radius:12px;">
   <h4>📤 Submit Your Own Meme Template</h4>
@@ -404,51 +391,28 @@
 
 
   <script>
-    const memeImages = [];
-
 let selectedMemeURL = null;
 
-function openCollectionModal(src) {
-  document.getElementById("collectionModalImage").src = src;
-  document.getElementById("collectionModal").style.display = "flex";
-
-  const header = document.getElementById("collectionModalHeader");
-  header.innerHTML = "";
-
-  const backBtn = document.createElement("span");
-  backBtn.className = "close-button";
-  backBtn.textContent = "⬅️ Back";
-  backBtn.onclick = () => {
-    document.getElementById("collectionModal").style.display = "none";
+function openModal(src) {
+  document.getElementById("modalImage").src = src;
+  document.getElementById("memeModal").style.display = "flex";
+  document.getElementById("useModalImage").onclick = () => {
+    selectedMemeURL = src;
+    document.getElementById("memeModal").style.display = "none";
+    generateMeme(); // ✅ Immediately show it in the canvas
   };
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "Remove";
-  deleteBtn.className = "use-image-button";
-  deleteBtn.style.marginLeft = "10px";
-  deleteBtn.onclick = () => {
-    const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
-    const updated = saved.filter(item => item !== src);
-    localStorage.setItem("generatedMemes", JSON.stringify(updated));
-    document.getElementById("collectionModal").style.display = "none";
-    renderMemeCollections();
-  };
-
-  header.appendChild(backBtn);
-  header.appendChild(deleteBtn);
-
-  setTimeout(() => {
-    document.getElementById("collectionModal").scrollIntoView({ behavior: "smooth", block: "center" });
-  }, 100);
 }
 
+    function openModal(src) {
+  document.getElementById("modalImage").src = src;
+  document.getElementById("memeModal").style.display = "flex";
+}
 
-  
+document.getElementById("closeModal").onclick = () => {
+  document.getElementById("memeModal").style.display = "none";
+};
 
 
-
-
-    
     
     const quoteList = [];
     const crushList = [];
@@ -510,12 +474,11 @@ function generateRandomQuote() {
 function loadCrushes() {
   const saved = JSON.parse(localStorage.getItem("studentCrushes") || "[]");
   const now = Date.now();
-  const valid = saved.filter(c => c.expiresAt > now);
   crushList.length = 0;
-  valid.forEach(c => crushList.push(c));
-  localStorage.setItem("studentCrushes", JSON.stringify(valid));
+  saved.forEach(c => {
+    if (c.expiresAt > now) crushList.push(c);
+  });
 }
-
 
 
     function reactToQuote(index, emoji) {
@@ -637,7 +600,7 @@ function triggerEmojiBurst(emoji, x, y) {
     function checkAnswer(answer) {
     const correct = "Steve Jobs";
     const feedback = document.getElementById("quizFeedback");
-    feedback.textContent = answer === correct ? "Nice! You deserve a latte!" : "Oops, Try again!";
+    feedback.textContent = answer === correct ? "✅ Correct!" : "❌ Try again!";
   }
 
   const memeImages = [
@@ -699,48 +662,46 @@ function generateMeme() {
   const ctx = canvas.getContext("2d");
   const topText = document.getElementById("topText").value;
   const bottomText = document.getElementById("bottomText").value;
+const memeImg = new Image();
+memeImg.crossOrigin = "anonymous";
+memeImg.src = selectedMemeURL || memeImages[Math.floor(Math.random() * memeImages.length)].url;
 
-  const memeImg = new Image();
-  memeImg.crossOrigin = "anonymous";
-  memeImg.src = selectedMemeURL || memeImages[Math.floor(Math.random() * memeImages.length)].url;
 
   memeImg.onload = function () {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(memeImg, 0, 0, canvas.width, canvas.height);
-  ctx.font = "bold 24px Arial";
-  ctx.fillStyle = "white";
-  ctx.strokeStyle = "black";
-  ctx.lineWidth = 2;
-  ctx.textAlign = "center";
-  ctx.fillText(topText, canvas.width / 2, 40);
-  ctx.strokeText(topText, canvas.width / 2, 40);
-  ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
-  ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 20);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(memeImg, 0, 0, canvas.width, canvas.height);
+    ctx.font = "bold 24px Arial";
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.textAlign = "center";
+    ctx.fillText(topText, canvas.width / 2, 40);
+    ctx.strokeText(topText, canvas.width / 2, 40);
+    ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
+    ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 20);
 
-  const canvasCopy = document.createElement("canvas");
-  canvasCopy.width = 120;
-  canvasCopy.height = 120;
-  const ctxCopy = canvasCopy.getContext("2d");
-  ctxCopy.drawImage(canvas, 0, 0, 120, 120);
-
-  const thumbImg = new Image();
-  thumbImg.src = canvasCopy.toDataURL("image/png");
-  thumbImg.style.borderRadius = "8px";
-  thumbImg.style.margin = "5px";
-
-  setTimeout(() => {
+    const canvasCopy = document.createElement("canvas");
+    canvasCopy.width = 120;
+    canvasCopy.height = 120;
+    const ctxCopy = canvasCopy.getContext("2d");
+    ctxCopy.drawImage(canvas, 0, 0, 120, 120);
+    const thumbImg = new Image();
+    thumbImg.src = canvasCopy.toDataURL("image/png");
+    thumbImg.style.borderRadius = "8px";
+    thumbImg.style.margin = "5px";
+    document.getElementById("generatedMemeGallery").appendChild(thumbImg);
     const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
-    saved.push(thumbImg.src);
-    localStorage.setItem("generatedMemes", JSON.stringify(saved));
-    renderMemeCollections();
-  }, 100);
-};
+saved.push(thumbImg.src);
+localStorage.setItem("generatedMemes", JSON.stringify(saved));
+renderMemeCollections(); 
+
+
+    
+  };
 }
 
 
-
 function generateRandomMeme() {
-  selectedMemeURL = null;
   const randomIndex = Math.floor(Math.random() * memeImages.length);
   document.getElementById("topText").value = memeImages[randomIndex].top;
   document.getElementById("bottomText").value = memeImages[randomIndex].bottom;
@@ -776,10 +737,7 @@ function showCoffeeTrivia() {
   }, 4000);
 }
 
-setTimeout(() => {
-  showCoffeeTrivia();
-  setInterval(showCoffeeTrivia, 7000);
-}, 3000);
+setInterval(showCoffeeTrivia, 7000);
 
 function downloadMeme() {
   const canvas = document.getElementById("memeCanvas");
@@ -840,7 +798,7 @@ function saveCustomMeme(url, top, bottom) {
     img.src = meme.url;
     img.alt = "Meme Template";
     img.title = `${meme.top} / ${meme.bottom}`;
-    img.onclick = () => openGalleryModal(meme.url);
+    img.onclick = () => openModal(meme.url);
     gallery.appendChild(img);
   });
 }
@@ -849,61 +807,33 @@ function saveCustomMeme(url, top, bottom) {
     function renderMemeCollections() {
   const gallery = document.getElementById("memeCollections");
   gallery.innerHTML = "";
-
   const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
 
-  saved.forEach(src => {
+  saved.forEach((src, index) => {
+    const wrapper = document.createElement("div");
+
     const img = new Image();
     img.src = src;
     img.alt = "Generated Meme";
-    img.style.width = "120px";
-    img.style.height = "120px";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "8px";
-    img.style.margin = "5px";
-    img.style.cursor = "pointer";
+    img.onclick = () => openModal(src);
 
-    img.onclick = () => openCollectionModal(src);
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Remove";
+    deleteBtn.style.marginTop = "5px";
+    deleteBtn.style.background = "#8d6e63"; // cozy brown
+    deleteBtn.onclick = () => {
+      saved.splice(index, 1);
+      localStorage.setItem("generatedMemes", JSON.stringify(saved));
+      renderMemeCollections();
+    };
 
-    gallery.appendChild(img);
+    wrapper.appendChild(img);
+    wrapper.appendChild(deleteBtn);
+    gallery.appendChild(wrapper);
   });
 }
 
-    function openCollectionModal(src) {
-  document.getElementById("collectionModalImage").src = src;
-  document.getElementById("collectionModal").style.display = "flex";
-
-  const header = document.getElementById("collectionModalHeader");
-  header.innerHTML = "";
-
-  const backBtn = document.createElement("span");
-  backBtn.className = "close-button";
-  backBtn.textContent = "⬅️ Back";
-  backBtn.onclick = () => {
-    document.getElementById("collectionModal").style.display = "none";
-  };
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "Remove";
-  deleteBtn.className = "use-image-button";
-  deleteBtn.style.marginLeft = "10px";
-  deleteBtn.onclick = () => {
-    const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
-    const updated = saved.filter(item => item !== src);
-    localStorage.setItem("generatedMemes", JSON.stringify(updated));
-    document.getElementById("collectionModal").style.display = "none";
-    renderMemeCollections();
-  };
-
-  header.appendChild(backBtn);
-  header.appendChild(deleteBtn);
-
-  setTimeout(() => {
-    document.getElementById("collectionModal").scrollIntoView({ behavior: "smooth", block: "center" });
-  }, 100);
-}
-
-
+    
     
     function toggleMemeInput() {
   const urlInput = document.getElementById("customUrl");
@@ -924,14 +854,12 @@ function saveCustomMeme(url, top, bottom) {
 }
 
 
-function memeCollections() {
-  if (confirm("Are you sure you want to clear all memes from the collection?")) {
-    localStorage.setItem("generatedMemes", JSON.stringify([]));
-    renderMemeCollections();
+function clearMemeGallery() {
+  if (confirm("Are you sure you want to clear all memes from the gallery?")) {
+    const gallery = document.getElementById("generatedMemeGallery");
+    gallery.innerHTML = "";
   }
 }
-
-
 
     function saveQuotes() {
   localStorage.setItem("studentQuotes", JSON.stringify(quoteList));
@@ -939,7 +867,7 @@ function memeCollections() {
 
 function loadQuotes() {
   const saved = JSON.parse(localStorage.getItem("studentQuotes") || "[]");
-  quoteList.length = 0; 
+  quoteList.length = 0; // Clear current list
   saved.forEach(q => quoteList.push(q));
 }
 
@@ -959,13 +887,9 @@ window.onload = function () {
 
 
 
-
 </script>
 
   <div id="emojiBurstContainer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden;"></div>
 
-</div> <!-- closes collectionModal .modal-content -->
-</div> <!-- closes collectionModal -->
 </body>
 </html>
-
