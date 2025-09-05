@@ -350,13 +350,17 @@
     </div>
 
     <div style="background:#fff3e0; padding:20px; border-radius:12px;">
-      <h4>🧠 Quote Quiz</h4>
-      <p id="quizQuestion">Who said: "The only way to do great work is to love what you do"?</p>
-      <button onclick="checkAnswer('Steve Jobs')">Steve Jobs</button>
-      <button onclick="checkAnswer('Albert Einstein')">Albert Einstein</button>
-      <button onclick="checkAnswer('Oprah Winfrey')">Oprah Winfrey</button>
-      <p id="quizFeedback" style="margin-top:10px;"></p>
-    </div>
+  <h4>🧠 Coffee Quiz</h4>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <span style="font-weight: bold;">☕ Latte Points: <span id="lattePoints">0</span></span>
+    <button onclick="resetLattePoints()" style="background:#d7ccc8; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">🔄 Reset</button>
+  </div>
+  <p id="quizQuestion" style="margin-bottom:10px;"></p>
+  <div id="quizOptions" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom:10px;"></div>
+  <p id="quizFeedback" style="margin-bottom:10px;"></p>
+  <button onclick="loadRandomCoffeeQuestion()" style="width:100%; background:#a1887f; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer;">☕ Next Brew</button>
+</div>
+
   </div>
 
   <div class="meme-generator" style="display: flex; gap: 20px; align-items: flex-start;">
@@ -420,7 +424,6 @@
 </div> <!-- closes .modal-content -->
 </div> <!-- closes #collectionModal -->
 
-<!-- ✅ Now place your Submit Meme section here -->
 <div style="margin-top:30px; background:#fff3e0; padding:20px; border-radius:12px;">
   <h4>📤 Submit Your Own Meme Template</h4>
   <button onclick="toggleMemeInput()">Switch to File Upload</button>
@@ -506,8 +509,136 @@ function openCollectionModal(src) {
   { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
   { text: "Coffee first. Capstone later.", author: "Yeon" },
   { text: "Success is not final, failure is not fatal.", author: "Winston Churchill" },
+  { text: "Life happens. Coffee helps.", author: "Anonymous" },
+  { text: "I run on caffeine, deadlines, and mild panic.", author: "Yeon" },
+  { text: "Reality called. I hit decline.", author: "Unknown" },
+  { text: "Behind every tired student is a coffee that tried its best.", author: "Yeon" },
+  { text: "Some days you win. Some days you spill your coffee.", author: "Anonymous" },
+  { text: "Caffeine: because adulting is hard.", author: "Yeon" },
+  { text: "The grind never stops — unless the beans run out.", author: "Barista Wisdom" },
+  { text: "Sadness is just unbrewed espresso.", author: "Yeon" },
+  { text: "You can't pour from an empty cup. Refill with coffee first.", author: "Self-Care Society" },
+  { text: "Group projects: where your silence is louder than your effort.", author: "Reality Hurts" },
+  { text: "Sleep is for the weak. Coffee is for the finals.", author: "Yeon" },
+  { text: "I’m not procrastinating. I’m marinating in potential.", author: "Student Logic" }
+  { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
+  { text: "Do not wait for the perfect moment. Take the moment and make it perfect.", author: "Zoey Sayward" },
+  { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
+  { text: "Happiness is not something ready made. It comes from your own actions.", author: "Dalai Lama" },
+  { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" }
 ];
 
+
+
+    const coffeeQuiz = [
+  {
+    question: "Which country drinks the most coffee per capita?",
+    correct: "Finland",
+    options: ["Finland", "Italy", "USA"]
+  },
+  {
+    question: "What does 'espresso' mean in Italian?",
+    correct: "Pressed out",
+    options: ["Fast", "Strong", "Pressed out"]
+  },
+  {
+    question: "What was the first webcam used to monitor?",
+    correct: "A coffee pot",
+    options: ["A printer", "A coffee pot", "A vending machine"]
+  },
+  {
+    question: "What fruit does coffee come from?",
+    correct: "Cherry",
+    options: ["Berry", "Cherry", "Nut"]
+  },
+  {
+    question: "Which famous composer counted 60 beans per cup?",
+    correct: "Beethoven",
+    options: ["Mozart", "Beethoven", "Bach"]
+  },
+  {
+    question: "What nickname did coffee earn in the Islamic world?",
+    correct: "Wine of Islam",
+    options: ["Black nectar", "Wine of Islam", "Sufi brew"]
+  },
+  {
+    question: "Which coffee drink is made with equal parts espresso and steamed milk?",
+    correct: "Flat white",
+    options: ["Latte", "Flat white", "Macchiato"]
+  },
+  {
+    question: "Which coffee bean variety is known for being smoother and less acidic?",
+    correct: "Arabica",
+    options: ["Robusta", "Arabica", "Liberica"]
+  },
+  {
+    question: "What’s the ideal brewing temperature for coffee?",
+    correct: "90–96°C",
+    options: ["80–85°C", "90–96°C", "100°C"]
+  },
+  {
+    question: "Which animal is associated with the discovery of coffee?",
+    correct: "Goat",
+    options: ["Monkey", "Goat", "Camel"]
+  }
+];
+
+
+let lattePoints = 0;
+let currentCoffeeQuestion = null;
+
+function loadRandomCoffeeQuestion() {
+  const randomIndex = Math.floor(Math.random() * coffeeQuiz.length);
+  currentCoffeeQuestion = coffeeQuiz[randomIndex];
+
+  document.getElementById("quizQuestion").textContent = currentCoffeeQuestion.question;
+
+  const optionsContainer = document.getElementById("quizOptions");
+  optionsContainer.innerHTML = "";
+
+  currentCoffeeQuestion.options.forEach(option => {
+    const btn = document.createElement("button");
+    btn.textContent = option;
+    btn.onclick = () => checkCoffeeAnswer(option);
+    btn.style.padding = "10px 20px";
+    btn.style.borderRadius = "6px";
+    btn.style.border = "none";
+    btn.style.backgroundColor = "#a1887f";
+    btn.style.color = "white";
+    btn.style.cursor = "pointer";
+    optionsContainer.appendChild(btn);
+  });
+
+  document.getElementById("quizFeedback").textContent = "";
+}
+
+function checkCoffeeAnswer(selected) {
+  const correct = currentCoffeeQuestion.correct;
+  const feedback = document.getElementById("quizFeedback");
+
+  if (selected === correct) {
+    lattePoints++;
+    document.getElementById("lattePoints").textContent = lattePoints;
+    feedback.textContent = "☕ Correct! You earned a latte point!";
+    feedback.style.color = "#4caf50";
+  } else {
+    feedback.textContent = "😬 Nope! That’s not the brew-tiful answer.";
+    feedback.style.color = "#e53935";
+  }
+}
+
+function resetLattePoints() {
+  lattePoints = 0;
+  document.getElementById("lattePoints").textContent = lattePoints;
+  document.getElementById("quizFeedback").textContent = "🔄 Latte Points reset!";
+  document.getElementById("quizFeedback").style.color = "#6d4c41";
+}
+
+
+
+
+
+    
 function generateRandomQuote() {
   const pick = randomQuotes[Math.floor(Math.random() * randomQuotes.length)];
   document.getElementById("quoteInput").value = `"${pick.text}" — ${pick.author}`;
