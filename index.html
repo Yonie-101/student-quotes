@@ -423,8 +423,22 @@
 
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
-  
-  <script>
+<script>
+  const firebaseConfig = {
+  apiKey: "AIzaSyD9B8m_cJ2kXQuwoliL3WAowC-hFgPBjBg",
+  authDomain: "student-cozy-corner.firebaseapp.com",
+  databaseURL: "https://student-cozy-corner-default-rtdb.firebaseio.com",
+  projectId: "student-cozy-corner",
+  storageBucket: "student-cozy-corner.appspot.com",
+  messagingSenderId: "436355859247",
+  appId: "1:436355859247:web:a98f51fb48219596ad57da"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+  db.ref("test").set({ hello: "world" });
+
     
 let selectedMemeURL = null;
 
@@ -1107,18 +1121,6 @@ window.onload = function () {
 };
 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyD9B8m_cJ2kXQuwoliL3WAowC-hFgPBjBg",
-  authDomain: "student-cozy-corner.firebaseapp.com",
-  databaseURL: "https://student-cozy-corner-default-rtdb.firebaseio.com",
-  projectId: "student-cozy-corner",
-  storageBucket: "student-cozy-corner.appspot.com",
-  messagingSenderId: "436355859247",
-  appId: "1:436355859247:web:a98f51fb48219596ad57da"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
 
 
 </script>
