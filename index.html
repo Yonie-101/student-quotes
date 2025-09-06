@@ -420,28 +420,32 @@
   <div id="coffeeTriviaModal" style="display:none; position:fixed; top:20px; right:20px; background-color:#ffeaa7; border:1px solid #dfe6e9; padding:10px 20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.2); font-weight:bold; color:#2d3436; font-family:'Segoe UI', sans-serif;">
 </div>
 
+  <div id="emojiBurstContainer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden;"></div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
-<script>
-  const firebaseConfig = {
-  apiKey: "AIzaSyD9B8m_cJ2kXQuwoliL3WAowC-hFgPBjBg",
-  authDomain: "student-cozy-corner.firebaseapp.com",
-  databaseURL: "https://student-cozy-corner-default-rtdb.firebaseio.com",
-  projectId: "student-cozy-corner",
-  storageBucket: "student-cozy-corner.appspot.com",
-  messagingSenderId: "436355859247",
-  appId: "1:436355859247:web:a98f51fb48219596ad57da"
-};
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database-compat.js"></script>
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-  db.ref("test").set({ hello: "world" });
-
+  
+  <script>
     
 let selectedMemeURL = null;
 
+    let quoteList = [];
+    let crushList = [];
+    const reactions = ["❤️", "😆", "😢", "😮", "😡"];
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD9B8m_cJ2kXQuwoliL3WAowC-hFgPBjBg",
+      authDomain: "student-cozy-corner.firebaseapp.com",
+      databaseURL: "https://student-cozy-corner-default-rtdb.firebaseio.com",
+      projectId: "student-cozy-corner",
+      storageBucket: "student-cozy-corner.appspot.com",
+      messagingSenderId: "436355859247",
+      appId: "1:436355859247:web:a98f51fb48219596ad57da"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 function openCollectionModal(src) {
   document.getElementById("collectionModalImage").src = src;
   document.getElementById("collectionModal").style.display = "flex";
@@ -482,21 +486,20 @@ function openCollectionModal(src) {
     const reactions = ["❤️", "😆", "😢", "😮", "😡"];
 
     function postQuote() {
-  const input = document.getElementById("quoteInput");
-  const text = input.value.trim();
-  if (!text) return;
+      const input = document.getElementById("quoteInput");
+      const text = input.value.trim();
+      if (!text) return;
 
-  const entry = {
-    text,
-    reacts: { "❤️": 0, "😆": 0, "😢": 0, "😮": 0, "😡": 0 },
-    selectedReaction: null,
-    timestamp: Date.now()
-  };
+      const entry = {
+        text,
+        reacts: { "❤️": 0, "😆": 0, "😢": 0, "😮": 0, "😡": 0 },
+        selectedReaction: null,
+        timestamp: Date.now()
+      };
 
-  db.ref("quotes").push(entry);
-  input.value = "";
-}
-
+      db.ref("quotes").push(entry).catch(err => console.error("Failed to push quote:", err));
+      input.value = "";
+    }  
 
 
     const randomQuotes = [
@@ -631,24 +634,24 @@ function generateRandomQuote() {
 }
 
     function postCrush() {
-  const input = document.getElementById("crushInput");
-  const text = input.value.trim();
-  const expiry = document.getElementById("confessionExpiry").value;
+      const input = document.getElementById("crushInput");
+      const text = input.value.trim();
+      const expiry = document.getElementById("confessionExpiry").value;
 
-  if (!text || !expiry) {
-    alert("⚠️ Please enter a confession and select an expiry time.");
-    return;
-  }
+      if (!text || !expiry) {
+        alert("⚠️ Please enter a confession and select an expiry time.");
+        return;
+      }
 
-  const timestamp = Date.now();
-  const expiresAt = timestamp + parseFloat(expiry) * 60 * 1000;
+      const timestamp = Date.now();
+      const expiresAt = timestamp + parseFloat(expiry) * 60 * 1000;
 
-  const entry = { text, expiresAt, timestamp };
+      const entry = { text, expiresAt, timestamp };
 
-  db.ref("confessions").push(entry);
-  input.value = "";
-  document.getElementById("confessionExpiry").value = "";
-}
+      db.ref("confessions").push(entry).catch(err => console.error("Failed to push confession:", err));
+      input.value = "";
+      document.getElementById("confessionExpiry").value = "";
+    }
 
     function saveCrushes() {
   localStorage.setItem("studentCrushes", JSON.stringify(crushList));
@@ -675,112 +678,131 @@ function loadCrushes() {
 
 
 function renderQuotes() {
-  const container = document.getElementById("quoteList");
-  container.innerHTML = "";
+      const container = document.getElementById("quoteList");
 
-  db.ref("quotes").on("value", snapshot => {
-    container.innerHTML = "";
+      // Realtime listener - updates whenever quotes change
+      db.ref("quotes").on("value", snapshot => {
+        container.innerHTML = "";
+        // rebuild quoteList from snapshot
+        quoteList.length = 0;
+        snapshot.forEach(child => {
+          const q = child.val();
+          q._id = child.key; // store key for later use
+          quoteList.push(q);
 
-    snapshot.forEach(child => {
-      const q = child.val();
-      const quoteId = child.key;
-      const selected = q.selectedReaction || null;
+          const quoteId = child.key;
+          const selected = q.selectedReaction || null;
 
-      const div = document.createElement("div");
-      div.className = "entry";
-      div.style.position = "relative";
+          const div = document.createElement("div");
+          div.className = "entry";
+          div.style.position = "relative";
 
-      // Quote text
-      div.innerHTML = `<strong>${q.text}</strong>`;
+          // Quote text
+          div.innerHTML = `<strong>${q.text}</strong>`;
 
-      // Reaction circle (bottom-left)
-      const circle = document.createElement("div");
-      circle.className = "reaction-circle";
-      const activeReacts = Object.entries(q.reacts || {})
-        .filter(([_, count]) => count > 0)
-        .slice(0, 3);
-      circle.textContent = activeReacts.map(([r]) => r).join(" ");
-      div.appendChild(circle);
+          // Reaction circle (bottom-left)
+          const circle = document.createElement("div");
+          circle.className = "reaction-circle";
+          const activeReacts = Object.entries(q.reacts || {})
+            .filter(([_, count]) => count > 0)
+            .slice(0, 3);
+          circle.textContent = activeReacts.map(([r]) => r).join(" ");
+          div.appendChild(circle);
 
-      // Reaction buttons
-      const reactionDiv = document.createElement("div");
-      reactionDiv.className = "reactions";
-      if (selected) reactionDiv.setAttribute("data-selected", "true");
+          // Reaction buttons
+          const reactionDiv = document.createElement("div");
+          reactionDiv.className = "reactions";
+          if (selected) reactionDiv.setAttribute("data-selected", "true");
 
-      reactions.forEach(r => {
-        const span = document.createElement("span");
-        span.textContent = r;
-        if (selected === r) span.setAttribute("data-active", "true");
+          reactions.forEach(r => {
+            const span = document.createElement("span");
+            span.textContent = r;
+            if (selected === r) span.setAttribute("data-active", "true");
 
-        span.onclick = (e) => {
-          // Update selectedReaction and increment count in Firebase
-          db.ref(`quotes/${quoteId}/selectedReaction`).set(r);
-          db.ref(`quotes/${quoteId}/reacts/${r}`).transaction(current => (current || 0) + 1);
+            span.onclick = (e) => {
+              // Update selectedReaction and increment count in Firebase
+              db.ref(`quotes/${quoteId}/selectedReaction`).set(r);
+              db.ref(`quotes/${quoteId}/reacts/${r}`).transaction(current => (current || 0) + 1);
 
-          triggerEmojiBurst(r, e.clientX, e.clientY);
-        };
+              triggerEmojiBurst(r, e.clientX, e.clientY);
+            };
 
-        reactionDiv.appendChild(span);
+            reactionDiv.appendChild(span);
+          });
+
+          div.appendChild(reactionDiv);
+          container.appendChild(div);
+        });
+
+        // update top reacted list after we've rebuilt quoteList
+        updateTopQuotes();
+      }, err => {
+        console.error("Error reading quotes:", err);
       });
+    }
 
-      div.appendChild(reactionDiv);
-      container.appendChild(div);
-    });
-  });
-}
 
 
 function triggerEmojiBurst(emoji, x, y) {
-  const burst = document.createElement("div");
-  burst.className = "emoji-burst";
-  burst.textContent = emoji;
-  burst.style.left = `${x}px`;
-  burst.style.top = `${y}px`;
-  document.getElementById("emojiBurstContainer").appendChild(burst);
-  setTimeout(() => burst.remove(), 1000);
-}
+      const burst = document.createElement("div");
+      burst.className = "emoji-burst";
+      burst.textContent = emoji;
+      burst.style.left = `${x}px`;
+      burst.style.top = `${y}px`;
+      document.getElementById("emojiBurstContainer").appendChild(burst);
+      setTimeout(() => burst.remove(), 1000);
+    }
+
 
     function renderCrushes() {
-  const crushListEl = document.getElementById("crushList");
-  crushListEl.innerHTML = "";
+      const crushListEl = document.getElementById("crushList");
+      crushListEl.innerHTML = "";
 
-  db.ref("confessions").on("value", snapshot => {
-    crushListEl.innerHTML = "";
-    const now = Date.now();
+      db.ref("confessions").on("value", snapshot => {
+        crushListEl.innerHTML = "";
+        const now = Date.now();
 
-    snapshot.forEach(child => {
-      const crush = child.val();
-      if (crush.expiresAt > now) {
-        const div = document.createElement("div");
-        div.className = "entry";
-        div.textContent = crush.text;
-        crushListEl.appendChild(div);
-      }
-    });
-  });
-}
+        snapshot.forEach(child => {
+          const crush = child.val();
+          if (!crush) return;
+          if (crush.expiresAt > now) {
+            const div = document.createElement("div");
+            div.className = "entry";
+            div.textContent = crush.text;
+            crushListEl.appendChild(div);
+          } else {
+            // Optionally remove expired confession from DB:
+            // db.ref('confessions/' + child.key).remove();
+          }
+        });
+      }, err => {
+        console.error("Error reading confessions:", err);
+      });
+    }
 
 
     function updateTopQuotes() {
+      // safe guard: use (q.reacts || {})
       const sorted = [...quoteList].sort((a, b) => {
-        const totalA = Object.values(a.reacts).reduce((sum, val) => sum + val, 0);
-        const totalB = Object.values(b.reacts).reduce((sum, val) => sum + val, 0);
+        const totalA = Object.values(a.reacts || {}).reduce((sum, val) => sum + (val || 0), 0);
+        const totalB = Object.values(b.reacts || {}).reduce((sum, val) => sum + (val || 0), 0);
         return totalB - totalA;
       }).slice(0, 3);
+
       const list = document.getElementById("topQuotes");
       list.innerHTML = "";
       sorted.forEach(q => {
         const li = document.createElement("li");
         li.innerHTML = `
-  <strong>${q.text}</strong>
-  <div class="reaction-counts">
-    ${Object.entries(q.reacts).map(([r, count]) => `${r} ${count}`).join(" ")}
-  </div>
-`;
-
+          <strong>${q.text}</strong>
+          <div class="reaction-counts">
+            ${Object.entries(q.reacts || {}).map(([r, count]) => `${r} ${count}`).join(" ")}
+          </div>
+        `;
         list.appendChild(li);
       });
     }
+
 
     function brewCoffee() {
       coffeeCount++;
@@ -1107,25 +1129,16 @@ function loadQuotes() {
 }
 
 window.onload = function () {
-  loadQuotes();
-  renderQuotes();
-  updateTopQuotes();
+      // start realtime listeners
+      renderQuotes();
+      renderCrushes();
 
-  loadCrushes();
-  renderCrushes();
+      renderMemeGallery && renderMemeGallery();
+      renderMemeCollections && renderMemeCollections();
+      loadCrushes && loadCrushes(); 
+    };
 
-  const savedMemes = JSON.parse(localStorage.getItem("studentMemes") || "[]");
-  savedMemes.forEach(meme => memeImages.push(meme));
-  renderMemeGallery();
-  renderMemeCollections();
-};
-
-
-
-
-</script>
-  
-  <div id="emojiBurstContainer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden;"></div>
-  </body>
+  </script>
+</body>
 </html>
 
