@@ -454,39 +454,6 @@ function showNotification(msg, duration = 3000) {
   setTimeout(() => { n.style.display = 'none'; n.style.opacity = '0'; }, duration);
 }
 
-function openCollectionModal(src) {
-  document.getElementById("collectionModalImage").src = src;
-  document.getElementById("collectionModal").style.display = "flex";
-
-  const header = document.getElementById("collectionModalHeader");
-  header.innerHTML = "";
-
-  const backBtn = document.createElement("span");
-  backBtn.className = "close-button";
-  backBtn.textContent = "Back";
-  backBtn.onclick = () => {
-    document.getElementById("collectionModal").style.display = "none";
-  };
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "Remove";
-  deleteBtn.className = "use-image-button";
-  deleteBtn.style.marginLeft = "10px";
-  deleteBtn.onclick = () => {
-    const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
-    const updated = saved.filter(item => item !== src);
-    localStorage.setItem("generatedMemes", JSON.stringify(updated));
-    document.getElementById("collectionModal").style.display = "none";
-    renderMemeCollections();
-  };
-
-  header.appendChild(backBtn);
-  header.appendChild(deleteBtn);
-
-  setTimeout(() => {
-    document.getElementById("collectionModal").scrollIntoView({ behavior: "smooth", block: "center" });
-  }, 100);
-}
 
     
 
