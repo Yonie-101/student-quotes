@@ -1187,16 +1187,18 @@ function saveCustomMeme(url, top, bottom) {
   };
 
   const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "Remove";
-  deleteBtn.className = "use-image-button";
-  deleteBtn.style.marginLeft = "10px";
-  deleteBtn.onclick = () => {
-    const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
-    const updated = saved.filter(item => item !== src);
-    localStorage.setItem("generatedMemes", JSON.stringify(updated));
-    document.getElementById("collectionModal").style.display = "none";
-    renderMemeCollections();
-  };
+deleteBtn.textContent = "Remove";
+deleteBtn.className = "use-image-button";
+deleteBtn.style.marginLeft = "10px";
+deleteBtn.onclick = () => {
+  const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
+  const updated = saved.filter(item => item.full !== src);
+  localStorage.setItem("generatedMemes", JSON.stringify(updated));
+  document.getElementById("collectionModal").style.display = "none";
+  renderMemeCollections();
+  showNotification("Meme removed from collection");
+};
+
 
   header.appendChild(backBtn);
   header.appendChild(deleteBtn);
