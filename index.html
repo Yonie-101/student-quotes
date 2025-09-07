@@ -1049,45 +1049,47 @@ function createReminderToggle() {
   btn.style.top = '110px';
   btn.style.right = '16px';
   btn.style.zIndex = '9999';
-  btn.style.background = '#fff3e0';
-  btn.style.border = '1px solid #e0cfc4';
-  btn.style.padding = '8px 10px';
-  btn.style.borderRadius = '999px';
+  btn.style.background = '#a1887f';   
+  btn.style.color = 'white';
+  btn.style.border = 'none';
+  btn.style.width = '42px';
+  btn.style.height = '42px';
+  btn.style.borderRadius = '50%';
   btn.style.cursor = 'pointer';
-  btn.style.fontFamily = 'Segoe UI, sans-serif';
-  btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+  btn.style.fontSize = '20px';
   btn.style.display = 'flex';
   btn.style.alignItems = 'center';
-  btn.style.gap = '8px';
-  btn.innerHTML = `<span id="reminderIcon">${reminderEnabled ? '🔔' : '🔕'}</span><span id="reminderLabel">${reminderMode === 'coffeeTrivia' ? 'Coffee Trivia' : 'Relax & Chill'}</span>`;
+  btn.style.justifyContent = 'center';
+  btn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+  btn.textContent = reminderEnabled ? '🔔' : '🔕';
 
-  btn.title = reminderEnabled ? `Reminders: ${reminderMode === 'coffeeTrivia' ? 'Coffee Trivia (enabled)' : 'Relax & Chill (enabled)'}` : 'Reminders: Off';
+  btn.title = reminderEnabled
+    ? (reminderMode === 'coffeeTrivia' ? 'Coffee Trivia (enabled)' : 'Relax & Chill (enabled)')
+    : 'Reminders Off';
 
   btn.onclick = () => {
     reminderEnabled = !reminderEnabled;
     if (reminderEnabled) startReminderScheduler(); else stopReminderScheduler();
-    const icon = document.getElementById('reminderIcon');
-    icon.textContent = reminderEnabled ? '🔔' : '🔕';
-    btn.title = reminderEnabled ? `Reminders: ${reminderMode === 'coffeeTrivia' ? 'Coffee Trivia (enabled)' : 'Relax & Chill (enabled)'}` : 'Reminders: Off';
-    showNotification(reminderEnabled ? 'Reminders enabled' : 'Reminders disabled', 1500);
+    btn.textContent = reminderEnabled ? '🔔' : '🔕';
+    btn.title = reminderEnabled
+      ? (reminderMode === 'coffeeTrivia' ? 'Coffee Trivia (enabled)' : 'Relax & Chill (enabled)')
+      : 'Reminders Off';
+    showNotification(btn.title, 1500);
   };
 
   btn.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     reminderMode = (reminderMode === 'coffeeTrivia') ? 'relax' : 'coffeeTrivia';
-    const label = document.getElementById('reminderLabel');
-    label.textContent = reminderMode === 'coffeeTrivia' ? 'Coffee Trivia' : 'Relax & Chill';
     if (reminderEnabled) startReminderScheduler();
-    btn.title = reminderEnabled ? `Reminders: ${reminderMode === 'coffeeTrivia' ? 'Coffee Trivia (enabled)' : 'Relax & Chill (enabled)'}` : 'Reminders: Off';
+    btn.title = reminderEnabled
+      ? (reminderMode === 'coffeeTrivia' ? 'Coffee Trivia (enabled)' : 'Relax & Chill (enabled)')
+      : 'Reminders Off';
     showNotification('Reminder mode: ' + (reminderMode === 'coffeeTrivia' ? 'Coffee Trivia' : 'Relax & Chill'), 1800);
     return false;
   });
 
   btn.addEventListener('mouseenter', () => {
-    const msg = reminderEnabled
-      ? `Reminders: ${reminderMode === 'coffeeTrivia' ? 'Coffee Trivia (enabled)' : 'Relax & Chill (enabled)'}`
-      : 'Reminders: Off';
-    showNotification(msg, 1200);
+    showNotification(btn.title, 1200);
   });
 
   document.body.appendChild(btn);
@@ -1095,6 +1097,7 @@ function createReminderToggle() {
 
 createReminderToggle();
 startReminderScheduler();
+
 
     
 function downloadMeme() {
