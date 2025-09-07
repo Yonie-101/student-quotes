@@ -506,18 +506,19 @@ function testWrite() {
   db.ref(tpath).push(payload)
     .then(() => {
       console.log("Test write successful. Check Firebase console at path:", tpath);
-      showNotification($1);
+      showNotification("Test write ok — check Firebase Realtime Database (/debug/testWrites)");
     })
     .catch(err => {
-      console.error("❌ Test write failed:", err);
-      showNotification($1);
+      console.error("Test write failed:", err);
+      showNotification("Test write failed — check console for details");
+
     });
 }
 
 function postQuoteDebug() {
   const input = document.getElementById("quoteInput");
   const text = input.value.trim();
-  if (!text) { showNotification($1); return; }
+  if (!text) { showNotification("⚠️ Please type a quote first"); return; }
 
   const entry = {
     text,
@@ -530,14 +531,21 @@ function postQuoteDebug() {
   db.ref("quotes").push(entry)
     .then(() => {
       console.log("push() resolved — quote added");
-      alert("Quote posted! Refresh Firebase console (Realtime DB) to verify.");
+      showNotification("Quote posted! Refresh Firebase console (Realtime DB) to verify.");
       input.value = "";
     })
     .catch(err => {
       console.error("push() error:", err);
-      alert("Failed to post quote — check console for error (permission/network).");
+      showNotification("Failed to post quote — check console for error (permission/network).");
     });
 }
+
+    function postQuote() {
+  if (typeof postQuoteDebug === 'function') return postQuoteDebug();
+  showNotification("Posting temporarily unavailable.");
+}
+
+
 
 const dbgBtn = document.createElement("button");
 dbgBtn.textContent = "DEBUG: testWrite()";
@@ -1243,7 +1251,7 @@ function memeCollections() {
   renderMemeCollections();
   showNotification("Meme collection cleared!");
 }
-}
+
 
     function saveQuotes() {
   localStorage.setItem("studentQuotes", JSON.stringify(quoteList));
