@@ -401,7 +401,6 @@
   </div>
 
 </div> 
-</div> 
 
 <div style="margin-top:30px; background:#fff3e0; padding:20px; border-radius:12px;">
   <h4>📤 Submit Your Own Meme Template</h4>
@@ -656,7 +655,7 @@ function generateRandomQuote() {
       const expiry = document.getElementById("confessionExpiry").value;
 
       if (!text || !expiry) {
-        showNotification($1);
+	showNotification("⚠️ Please fill in all fields");
         return;
       }
 
@@ -1098,7 +1097,7 @@ function submitCustomMeme() {
       saveCustomMeme(memeURL, top, bottom);
     }
   } else {
-    showNotification($1);
+    showNotification("Meme added!");
   }
 }
 function saveCustomMeme(url, top, bottom) {
@@ -1109,7 +1108,7 @@ function saveCustomMeme(url, top, bottom) {
   savedMemes.push(newMeme);
   localStorage.setItem("studentMemes", JSON.stringify(savedMemes));
 
-  showNotification($1);
+  showNotification("Meme added!");
   document.getElementById("customUrl").value = "";
   document.getElementById("customTop").value = "";
   document.getElementById("customBottom").value = "";
