@@ -205,7 +205,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  min-height: 120px; /* ensures it doesn't collapse */
+  min-height: 120px; 
 }
 
 .gallery-grid img {
@@ -263,7 +263,6 @@
   cursor: pointer;
 }
 
-
     #collectionModalHeader {
   display: flex;
   justify-content: space-between;
@@ -280,7 +279,6 @@
   margin: 0 auto;
   border-radius: 12px;
 }
-
 
 .modal {
   opacity: 0;
@@ -372,13 +370,12 @@
 </div>
 
   <div class="section">
-  <!-- Meme Gallery -->
+  
 <div class="column">
   <h3>🖼️ Meme Gallery (Templates)</h3>
 <div id="memeGallery" class="scrollable-box gallery-grid" style="max-height: 300px;"></div>
 </div>
 
-<!-- Meme Collections -->
 <div class="column">
   <h3>🎨 Meme Collections (Creations)</h3>
 <div id="memeCollections" class="scrollable-box gallery-grid" style="max-height: 300px;"></div>
@@ -386,7 +383,7 @@
 
     </div>
 
-<!-- Modal for Meme Gallery -->
+
 <div id="galleryModal" class="modal" style="display:none;">
   <div class="modal-content">
     <div class="modal-header">
@@ -397,7 +394,6 @@
   </div>
 </div>
 
-<!-- Modal for Meme Collections -->
 <div id="collectionModal" class="modal" style="display:none;">
   <div class="modal-content">
     <div class="modal-header" id="collectionModalHeader"></div>
@@ -480,22 +476,17 @@ function openCollectionModal(src) {
   }, 100);
 }
 
-
     
 
-    // ---------- DEBUG HELPERS (paste immediately after `const db = firebase.database();`) ----------
-console.log("Firebase apps:", firebase.apps);
+    console.log("Firebase apps:", firebase.apps);
 console.log("Firebase app options:", firebase.apps[0] && firebase.apps[0].options);
 
-// show databaseURL
-try { console.log("DB URL:", firebase.apps[0].options.databaseURL); } catch(e){console.warn(e);}
+try { console.log("DB URL:", firebase.apps[0].options.databaseURL); } catch(e){console.warn(e);} 
 
-// watch connection state (Realtime DB)
 db.ref(".info/connected").on("value", snap => {
   console.log(".info/connected:", snap.val());
 });
 
-// small test write (non-destructive)
 function testWrite() {
   const tpath = "debug/testWrites";
   const payload = { ts: Date.now(), source: "site-debug" };
@@ -511,7 +502,6 @@ function testWrite() {
     });
 }
 
-// replace postQuote with this debug-friendly variant (or paste into your code to overwrite)
 function postQuoteDebug() {
   const input = document.getElementById("quoteInput");
   const text = input.value.trim();
@@ -537,7 +527,6 @@ function postQuoteDebug() {
     });
 }
 
-// call testWrite() manually in console or attach a temp button to run it easily:
 const dbgBtn = document.createElement("button");
 dbgBtn.textContent = "DEBUG: testWrite()";
 dbgBtn.style.position = "fixed";
@@ -546,11 +535,8 @@ dbgBtn.style.right = "8px";
 dbgBtn.style.zIndex = 9999;
 dbgBtn.onclick = testWrite;
 document.body.appendChild(dbgBtn);
-// Also attach postQuoteDebug to the existing Post Quote button temporarily:
 const postBtn = document.querySelector('[onclick="postQuote()"]');
 if (postBtn) postBtn.onclick = postQuoteDebug;
-// ---------- END DEBUG HELPERS ----------
-
 
     const randomQuotes = [
   { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
@@ -730,14 +716,12 @@ function loadCrushes() {
 function renderQuotes() {
       const container = document.getElementById("quoteList");
 
-      // Realtime listener - updates whenever quotes change
       db.ref("quotes").on("value", snapshot => {
         container.innerHTML = "";
-        // rebuild quoteList from snapshot
         quoteList.length = 0;
         snapshot.forEach(child => {
           const q = child.val();
-          q._id = child.key; // store key for later use
+          q._id = child.key;
           quoteList.push(q);
 
           const quoteId = child.key;
@@ -747,10 +731,8 @@ function renderQuotes() {
           div.className = "entry";
           div.style.position = "relative";
 
-          // Quote text
           div.innerHTML = `<strong>${q.text}</strong>`;
 
-          // Reaction circle (bottom-left)
           const circle = document.createElement("div");
           circle.className = "reaction-circle";
           const activeReacts = Object.entries(q.reacts || {})
@@ -759,7 +741,6 @@ function renderQuotes() {
           circle.textContent = activeReacts.map(([r]) => r).join(" ");
           div.appendChild(circle);
 
-          // Reaction buttons
           const reactionDiv = document.createElement("div");
           reactionDiv.className = "reactions";
           if (selected) reactionDiv.setAttribute("data-selected", "true");
@@ -770,7 +751,6 @@ function renderQuotes() {
             if (selected === r) span.setAttribute("data-active", "true");
 
             span.onclick = (e) => {
-              // Update selectedReaction and increment count in Firebase
               db.ref(`quotes/${quoteId}/selectedReaction`).set(r);
               db.ref(`quotes/${quoteId}/reacts/${r}`).transaction(current => (current || 0) + 1);
 
@@ -784,13 +764,11 @@ function renderQuotes() {
           container.appendChild(div);
         });
 
-        // update top reacted list after we've rebuilt quoteList
         updateTopQuotes();
       }, err => {
         console.error("Error reading quotes:", err);
       });
     }
-
 
 
 function triggerEmojiBurst(emoji, x, y) {
@@ -821,8 +799,6 @@ function triggerEmojiBurst(emoji, x, y) {
             div.textContent = crush.text;
             crushListEl.appendChild(div);
           } else {
-            // Optionally remove expired confession from DB:
-            // db.ref('confessions/' + child.key).remove();
           }
         });
       }, err => {
@@ -832,7 +808,6 @@ function triggerEmojiBurst(emoji, x, y) {
 
 
     function updateTopQuotes() {
-      // safe guard: use (q.reacts || {})
       const sorted = [...quoteList].sort((a, b) => {
         const totalA = Object.values(a.reacts || {}).reduce((sum, val) => sum + (val || 0), 0);
         const totalB = Object.values(b.reacts || {}).reduce((sum, val) => sum + (val || 0), 0);
@@ -869,52 +844,52 @@ function triggerEmojiBurst(emoji, x, y) {
 
   const memeImages = [
   {
-    url: "https://i.imgflip.com/1bij.jpg", // Distracted Boyfriend
+    url: "https://i.imgflip.com/1bij.jpg",
     top: "Me trying to focus",
     bottom: "But coffee exists ☕"
   },
   {
-    url: "https://i.imgflip.com/26am.jpg", // Grumpy Cat
+    url: "https://i.imgflip.com/26am.jpg",
     top: "Mondays?",
     bottom: "No thanks."
   },
   {
-    url: "https://i.imgflip.com/3si4.jpg", // One Does Not Simply
+    url: "https://i.imgflip.com/3si4.jpg",
     top: "One does not simply",
     bottom: "Finish a group project without memes"
   },
   {
-    url: "https://i.imgflip.com/30b1gx.jpg", // Mocking Spongebob
+    url: "https://i.imgflip.com/30b1gx.jpg",
     top: "You should sleep early",
     bottom: "mE: 'sLeEp EaRlY'"
   },
   {
-    url: "https://i.imgflip.com/1otk96.jpg", // Roll Safe
+    url: "https://i.imgflip.com/1otk96.jpg",
     top: "Can't fail the quiz",
     bottom: "If you never take it"
   },
   {
-    url: "https://i.imgflip.com/2wifvo.jpg", // Woman Yelling at Cat
+    url: "https://i.imgflip.com/2wifvo.jpg",
     top: "Groupmate: I did my part",
     bottom: "Reality: 😼"
   },
   {
-    url: "https://i.imgflip.com/4t0m5.jpg", // Leonardo DiCaprio Cheers
+    url: "https://i.imgflip.com/4t0m5.jpg",
     top: "To surviving finals",
     bottom: "With caffeine and chaos"
   },
   {
-    url: "https://i.imgflip.com/1g8my4.jpg", // Confused Math Lady
+    url: "https://i.imgflip.com/1g8my4.jpg",
     top: "Trying to understand",
     bottom: "JavaScript logic"
   },
   {
-    url: "https://i.imgflip.com/1b7v.jpg", // Success Kid
-    top: "Submitted on time",
-    bottom: "Before the deadline!"
+    url: "https://i.imgflip.com/1b7v.jpg",
+    top: "Success Kid",
+    bottom: "Submitted on time"
   },
   {
-    url: "https://i.imgflip.com/1ur9b0.jpg", // Left Exit 12 Off Ramp
+    url: "https://i.imgflip.com/1ur9b0.jpg",
     top: "Doing homework",
     bottom: "Making memes instead"
   }
@@ -1179,7 +1154,6 @@ function loadQuotes() {
 }
 
 window.onload = function () {
-      // start realtime listeners
       renderQuotes();
       renderCrushes();
 
@@ -1191,4 +1165,3 @@ window.onload = function () {
   </script>
 </body>
 </html>
-
