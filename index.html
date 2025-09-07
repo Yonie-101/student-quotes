@@ -418,6 +418,7 @@
 
   <div id="emojiBurstContainer" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden;"></div>
 
+  <div id="notification" style="position:fixed;bottom:20px;right:20px;background:#333;color:#fff;padding:10px;border-radius:5px;display:none;z-index:9999;max-width:320px;word-wrap:break-word;box-shadow:0 4px 12px rgba(0,0,0,0.15);"></div>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database-compat.js"></script>
 
@@ -442,6 +443,17 @@ let selectedMemeURL = null;
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+function showNotification(msg, duration = 3000) {
+  const n = document.getElementById('notification');
+  if (!n) return console.log(msg);
+  n.textContent = msg;
+  n.style.display = 'block';
+  n.style.opacity = '0.95';
+  n.style.transform = 'translateY(0)';
+  setTimeout(() => { n.style.display = 'none'; n.style.opacity = '0'; }, duration);
+}
+
 function openCollectionModal(src) {
   document.getElementById("collectionModalImage").src = src;
   document.getElementById("collectionModal").style.display = "flex";
@@ -494,18 +506,18 @@ function testWrite() {
   db.ref(tpath).push(payload)
     .then(() => {
       console.log("✅ Test write successful. Check Firebase console at path:", tpath);
-      alert("✅ Test write ok — check Firebase Realtime Database console for /debug/testWrites");
+      showNotification($1);
     })
     .catch(err => {
       console.error("❌ Test write failed:", err);
-      alert("❌ Test write failed — see console for details");
+      showNotification($1);
     });
 }
 
 function postQuoteDebug() {
   const input = document.getElementById("quoteInput");
   const text = input.value.trim();
-  if (!text) { alert("Please type a quote first"); return; }
+  if (!text) { showNotification($1); return; }
 
   const entry = {
     text,
@@ -675,7 +687,7 @@ function generateRandomQuote() {
       const expiry = document.getElementById("confessionExpiry").value;
 
       if (!text || !expiry) {
-        alert("⚠️ Please enter a confession and select an expiry time.");
+        showNotification($1);
         return;
       }
 
@@ -796,6 +808,7 @@ function triggerEmojiBurst(emoji, x, y) {
           if (crush.expiresAt > now) {
             const div = document.createElement("div");
             div.className = "entry";
+            div.style.fontStyle = "italic";
             div.textContent = crush.text;
             crushListEl.appendChild(div);
           } else {
@@ -1010,7 +1023,7 @@ function submitCustomMeme() {
       saveCustomMeme(memeURL, top, bottom);
     }
   } else {
-    alert("⚠️ Please fill in all fields.");
+    showNotification($1);
   }
 }
 function saveCustomMeme(url, top, bottom) {
@@ -1021,7 +1034,7 @@ function saveCustomMeme(url, top, bottom) {
   savedMemes.push(newMeme);
   localStorage.setItem("studentMemes", JSON.stringify(savedMemes));
 
-  alert(" ✓ Meme template added! Try Random Meme to see it.");
+  showNotification($1);
   document.getElementById("customUrl").value = "";
   document.getElementById("customTop").value = "";
   document.getElementById("customBottom").value = "";
@@ -1137,10 +1150,10 @@ function saveCustomMeme(url, top, bottom) {
 }
 
 function memeCollections() {
-  if (confirm("Are you sure you want to clear all memes from the collection?")) {
-    localStorage.setItem("generatedMemes", JSON.stringify([]));
-    renderMemeCollections();
-  }
+  localStorage.setItem("generatedMemes", JSON.stringify([]));
+  renderMemeCollections();
+  showNotification("✅ Meme collection cleared");
+}
 }
 
     function saveQuotes() {
