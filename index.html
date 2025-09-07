@@ -940,17 +940,22 @@ function generateMeme() {
   const ctxCopy = canvasCopy.getContext("2d");
   ctxCopy.drawImage(canvas, 0, 0, 120, 120);
 
-  const thumbImg = new Image();
-  thumbImg.src = canvasCopy.toDataURL("image/png");
-  thumbImg.style.borderRadius = "8px";
-  thumbImg.style.margin = "5px";
+  const fullImg = canvas.toDataURL("image/png"); 
 
-  setTimeout(() => {
-    const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
-    saved.push(thumbImg.src);
-    localStorage.setItem("generatedMemes", JSON.stringify(saved));
-    renderMemeCollections();
-  }, 100);
+const canvasCopy = document.createElement("canvas");
+canvasCopy.width = 120;
+canvasCopy.height = 120;
+const ctxCopy = canvasCopy.getContext("2d");
+ctxCopy.drawImage(canvas, 0, 0, 120, 120);
+const thumbImg = canvasCopy.toDataURL("image/png");
+
+setTimeout(() => {
+  const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
+  saved.push({ thumb: thumbImg, full: fullImg });
+  localStorage.setItem("generatedMemes", JSON.stringify(saved));
+  renderMemeCollections();
+}, 100);
+
 };
 }
 
@@ -1188,21 +1193,21 @@ function saveCustomMeme(url, top, bottom) {
 
   const saved = JSON.parse(localStorage.getItem("generatedMemes") || "[]");
 
-  saved.forEach(src => {
-    const img = new Image();
-    img.src = src;
-    img.alt = "Generated Meme";
-    img.style.width = "120px";
-    img.style.height = "120px";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "8px";
-    img.style.margin = "5px";
-    img.style.cursor = "pointer";
+  saved.forEach(item => {
+  const img = new Image();
+  img.src = item.thumb;   
+  img.alt = "Generated Meme";
+  img.style.width = "120px";
+  img.style.height = "120px";
+  img.style.objectFit = "cover";
+  img.style.borderRadius = "8px";
+  img.style.margin = "5px";
+  img.style.cursor = "pointer";
 
-    img.onclick = () => openCollectionModal(src);
+  img.onclick = () => openCollectionModal(item.full); 
+  gallery.appendChild(img);
+});
 
-    gallery.appendChild(img);
-  });
 }
 
     function openCollectionModal(src) {
