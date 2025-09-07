@@ -505,7 +505,7 @@ function testWrite() {
   console.log("Attempting test write to", tpath, payload);
   db.ref(tpath).push(payload)
     .then(() => {
-      console.log("✅ Test write successful. Check Firebase console at path:", tpath);
+      console.log("Test write successful. Check Firebase console at path:", tpath);
       showNotification($1);
     })
     .catch(err => {
@@ -529,12 +529,12 @@ function postQuoteDebug() {
   console.log("Posting quote to /quotes:", entry);
   db.ref("quotes").push(entry)
     .then(() => {
-      console.log("✅ push() resolved — quote added");
+      console.log("push() resolved — quote added");
       alert("Quote posted! Refresh Firebase console (Realtime DB) to verify.");
       input.value = "";
     })
     .catch(err => {
-      console.error("❌ push() error:", err);
+      console.error("push() error:", err);
       alert("Failed to post quote — check console for error (permission/network).");
     });
 }
@@ -552,19 +552,20 @@ if (postBtn) postBtn.onclick = postQuoteDebug;
 
     const randomQuotes = [
   { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
-  { text: "Coffee first. Capstone later.", author: "Yeon" },
+  { text: "Coffee first. Capstone later.", author: "Yonie" },
   { text: "Success is not final, failure is not fatal.", author: "Winston Churchill" },
   { text: "Life happens. Coffee helps.", author: "Anonymous" },
   { text: "I run on caffeine, deadlines, and mild panic.", author: "Yeon" },
   { text: "Reality called. I hit decline.", author: "Unknown" },
-  { text: "Behind every tired student is a coffee that tried its best.", author: "Yeon" },
-  { text: "Some days you win. Some days you spill your coffee.", author: "Anonymous" },
-  { text: "Caffeine: because adulting is hard.", author: "Yeon" },
+  { text: "PAPASA TAYO GAIS", author: "I BILIB" },
+  { text: "Behind every tired student is a coffee that tried its best.", author: "Anonymous" },
+  { text: "Some days you win. Some days you spill your coffee.", author: "Unknown" },
+  { text: "Hanggang san a-abot 20 pesos mo?", author: "Cornetto" },
   { text: "The grind never stops — unless the beans run out.", author: "Barista Wisdom" },
-  { text: "Sadness is just unbrewed espresso.", author: "Yeon" },
+  { text: "Gusto ko na matulog.", author: "Yonie" },
   { text: "You can't pour from an empty cup. Refill with coffee first.", author: "Self-Care Society" },
   { text: "Group projects: where your silence is louder than your effort.", author: "Reality Hurts" },
-  { text: "Sleep is for the weak. Coffee is for the finals.", author: "Yeon" },
+  { text: "Sleep is for the weak. Kape na laman ng dugo ko.", author: "Yeon" },
   { text: "I’m not procrastinating. I’m marinating in potential.", author: "Student Logic" },  
   { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
   { text: "Do not wait for the perfect moment. Take the moment and make it perfect.", author: "Zoey Sayward" },
@@ -975,6 +976,7 @@ function generateRandomMeme() {
   "🎼☕ Beethoven was a coffee snob — he counted exactly 60 beans per cup before brewing. Precision brewing, classical edition.",
   "👀📹 The first webcam was invented to monitor a coffee pot at Cambridge University. Because hallway disappointment is real.",
   "🍷🕊️ Coffee was once called the 'wine of Islam' — praised for its energizing effects and used in spiritual rituals before going global."
+  "wAlA pArin aKonG tUlOg hiHihiE💕✨"
 ];
 
 function showCoffeeTrivia() {
@@ -1152,7 +1154,7 @@ function saveCustomMeme(url, top, bottom) {
 function memeCollections() {
   localStorage.setItem("generatedMemes", JSON.stringify([]));
   renderMemeCollections();
-  showNotification("✅ Meme collection cleared");
+  showNotification("Meme collection cleared!");
 }
 }
 
