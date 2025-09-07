@@ -934,11 +934,6 @@ function generateMeme() {
   ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
   ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 20);
 
-  const canvasCopy = document.createElement("canvas");
-  canvasCopy.width = 120;
-  canvasCopy.height = 120;
-  const ctxCopy = canvasCopy.getContext("2d");
-  ctxCopy.drawImage(canvas, 0, 0, 120, 120);
 
   const fullImg = canvas.toDataURL("image/png"); 
 
